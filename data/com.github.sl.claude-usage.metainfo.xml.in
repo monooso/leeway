@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>@APP_ID@</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Claude Usage</name>
+  <summary>Track Claude AI usage and rate limits</summary>
+  <description>
+    <p>
+      Monitor your Claude AI session and weekly usage in real time.
+      Colour-coded indicators show whether you are within safe limits
+      or approaching a rate-limit reset.
+    </p>
+  </description>
+  <launchable type="desktop-id">@APP_ID@.desktop</launchable>
+  <url type="homepage">https://github.com/sl/claude-usage-gnome</url>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="0.1.0" date="2026-02-20">
+      <description><p>Initial release.</p></description>
+    </release>
+  </releases>
+</component>

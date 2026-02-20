@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Claude Usage
+Comment=Track Claude AI usage and rate limits
+Exec=@BINDIR@/claude-usage
+Icon=@APP_ID@
+Terminal=false
+Type=Application
+Categories=Utility;
+StartupNotify=true

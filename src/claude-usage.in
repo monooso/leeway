@@ -1,0 +1,4 @@
+#!/bin/bash
+# Launcher for Claude Usage GNOME app
+export GSETTINGS_SCHEMA_DIR="${GSETTINGS_SCHEMA_DIR:-@SRCDIR@/../data}"
+exec @PYTHON@ @SRCDIR@/main.py "$@"

@@ -1,0 +1,2 @@
+option('python_path', type: 'string', value: '/usr/bin/python3',
+       description: 'Path to the Python 3 interpreter with PyGObject')
