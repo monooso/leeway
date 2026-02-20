@@ -313,8 +313,9 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
             self._weekly_bar.set_value(0)
 
         if data.weekly_resets_at:
+            local_reset = data.weekly_resets_at.astimezone()
             self._weekly_reset_label.set_label(
-                f"Resets {data.weekly_resets_at.strftime('%a %d %b %H:%M UTC')}"
+                f"Resets {local_reset.strftime('%a %d %b %H:%M')}"
             )
         else:
             self._weekly_reset_label.set_label("")
