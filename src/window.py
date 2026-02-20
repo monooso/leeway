@@ -153,24 +153,16 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         content_box.append(opus_group)
         self._opus_group = opus_group
 
-        # Status + last updated
-        footer_box = Gtk.Box(
-            orientation=Gtk.Orientation.HORIZONTAL,
-            spacing=8,
+        # Status footer
+        self._status_label = Gtk.Label(
+            label="Loading\u2026",
             halign=Gtk.Align.CENTER,
             margin_top=12,
         )
-        self._status_label = Gtk.Label(label="Loading\u2026")
         self._status_label.add_css_class("dim-label")
         self._status_label.add_css_class("caption")
-        footer_box.append(self._status_label)
 
-        self._updated_label = Gtk.Label(label="")
-        self._updated_label.add_css_class("dim-label")
-        self._updated_label.add_css_class("caption")
-        footer_box.append(self._updated_label)
-
-        content_box.append(footer_box)
+        content_box.append(self._status_label)
 
         # Listen for settings changes to restart the timer
         self._settings = Gio.Settings.new(APP_ID)
@@ -264,7 +256,6 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
     def _refresh(self):
         """Read credentials and fetch usage data."""
         self._status_label.set_text("Refreshing\u2026")
-        self._updated_label.set_text("")
 
         try:
             creds = read_credentials()
@@ -339,13 +330,11 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
 
         # Footer
         now = datetime.now(timezone.utc).astimezone().strftime("%H:%M:%S")
-        self._status_label.set_text("Connected")
-        self._updated_label.set_text(f"\u00b7 Updated {now}")
+        self._status_label.set_text(f"Connected \u00b7 Updated {now}")
 
     def _show_error(self, message: str):
         """Display an error message in the status label."""
         self._status_label.set_text(f"Error: {_truncate_error(message)}")
-        self._updated_label.set_text("")
 
     def _check_notifications(self, data: UsageData):
         """Send desktop notifications when session usage crosses thresholds.
