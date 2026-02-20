@@ -126,22 +126,20 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
 
         # Session usage group
         session_group = Adw.PreferencesGroup(title="Session (5-hour)")
+        self._session_reset_label = self._make_header_suffix(session_group)
         self._session_row, self._session_bar = self._make_metric_row(
             "Usage", "—"
         )
-        self._session_reset_row, self._session_reset_label = self._make_reset_row("Resets in")
         session_group.add(self._session_row)
-        session_group.add(self._session_reset_row)
         content_box.append(session_group)
 
         # Weekly usage group
         weekly_group = Adw.PreferencesGroup(title="Weekly (7-day)")
+        self._weekly_reset_label = self._make_header_suffix(weekly_group)
         self._weekly_row, self._weekly_bar = self._make_metric_row(
             "Usage", "—"
         )
-        self._weekly_reset_row, self._weekly_reset_label = self._make_reset_row("Resets")
         weekly_group.add(self._weekly_row)
-        weekly_group.add(self._weekly_reset_row)
         content_box.append(weekly_group)
 
         # Opus weekly usage group
@@ -204,16 +202,13 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         row.add_suffix(bar)
         return row, bar
 
-    def _make_reset_row(
-        self, title: str
-    ) -> tuple[Adw.ActionRow, Gtk.Label]:
-        """Create an ActionRow with a suffix label for reset time."""
-        row = Adw.ActionRow(title=title)
-        label = Gtk.Label(label="—")
+    def _make_header_suffix(self, group: Adw.PreferencesGroup) -> Gtk.Label:
+        """Add a right-aligned reset-time label to a PreferencesGroup header."""
+        label = Gtk.Label(label="")
         label.add_css_class("dim-label")
         label.set_valign(Gtk.Align.CENTER)
-        row.add_suffix(label)
-        return row, label
+        group.set_header_suffix(label)
+        return label
 
     def _get_refresh_interval(self) -> int:
         """Get refresh interval from GSettings, with fallback."""
@@ -278,9 +273,8 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
             self._session_row.set_subtitle("—")
             self._session_bar.set_value(0)
 
-        self._session_reset_label.set_label(
-            _format_reset_time(data.session_resets_at)
-        )
+        reset_text = _format_reset_time(data.session_resets_at)
+        self._session_reset_label.set_label(f"Resets in {reset_text}")
 
         # Weekly
         if data.weekly_pct is not None:
@@ -293,10 +287,10 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
 
         if data.weekly_resets_at:
             self._weekly_reset_label.set_label(
-                data.weekly_resets_at.strftime("%a %d %b %H:%M UTC")
+                f"Resets {data.weekly_resets_at.strftime('%a %d %b %H:%M UTC')}"
             )
         else:
-            self._weekly_reset_label.set_label("—")
+            self._weekly_reset_label.set_label("")
 
         # Opus
         if data.opus_pct is not None:
