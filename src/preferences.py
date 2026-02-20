@@ -7,6 +7,8 @@ gi.require_version("Adw", "1")
 
 from gi.repository import Adw, Gio, Gtk
 
+from statusline import DEFAULT_SCRIPT_PATH, install_statusline, uninstall_statusline
+
 
 class PreferencesWindow(Adw.PreferencesWindow):
     """Application preferences."""
@@ -14,7 +16,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.set_title("Preferences")
-        self.set_default_size(400, 420)
+        self.set_default_size(400, 480)
         self.set_modal(True)
 
         settings = Gio.Settings.new("com.github.sl.claude-usage")
@@ -55,3 +57,27 @@ class PreferencesWindow(Adw.PreferencesWindow):
                 lambda r, _, k=key: settings.set_boolean(k, r.get_active()),
             )
             notify_group.add(row)
+
+        # Statusline group
+        statusline_group = Adw.PreferencesGroup(
+            title="Claude Code Statusline",
+            description="Show usage in the Claude Code terminal status line.",
+        )
+        page.add(statusline_group)
+
+        installed = DEFAULT_SCRIPT_PATH.exists()
+        statusline_row = Adw.SwitchRow(title="Enable statusline")
+        statusline_row.set_subtitle(
+            str(DEFAULT_SCRIPT_PATH) if installed else "Installs a bash script to ~/.claude/"
+        )
+        statusline_row.set_active(installed)
+        statusline_row.connect("notify::active", self._on_statusline_toggled)
+        statusline_group.add(statusline_row)
+
+    def _on_statusline_toggled(self, row, _param):
+        if row.get_active():
+            install_statusline()
+            row.set_subtitle(str(DEFAULT_SCRIPT_PATH))
+        else:
+            uninstall_statusline()
+            row.set_subtitle("Installs a bash script to ~/.claude/")
