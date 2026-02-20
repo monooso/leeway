@@ -41,8 +41,25 @@ def _format_reset_time(dt: datetime | None) -> str:
     return "< 1m"
 
 
+_bar_counter = 0
+
+
+def _assign_bar_css_class(bar: Gtk.LevelBar) -> str:
+    """Assign a unique CSS class to a LevelBar for scoped styling."""
+    global _bar_counter
+    cls = f"usage-bar-{_bar_counter}"
+    _bar_counter += 1
+    bar.add_css_class(cls)
+    bar._css_class = cls
+    return cls
+
+
 def _apply_color_to_bar(bar: Gtk.LevelBar, pct: float | None):
     """Apply a CSS colour to a LevelBar based on usage percentage."""
+    css_class = getattr(bar, "_css_class", None)
+    if css_class is None:
+        css_class = _assign_bar_css_class(bar)
+
     # Remove previous provider if we stored one
     old_provider = getattr(bar, "_css_provider", None)
     if old_provider is not None:
@@ -51,7 +68,7 @@ def _apply_color_to_bar(bar: Gtk.LevelBar, pct: float | None):
         )
 
     r, g, b = color_for_pct(pct)
-    css = f"""levelbar block.filled {{
+    css = f"""levelbar.{css_class} block.filled {{
         background-color: rgba({int(r*255)}, {int(g*255)}, {int(b*255)}, 1.0);
     }}"""
     provider = Gtk.CssProvider()

@@ -50,6 +50,6 @@ class Application(Adw.Application):
             developer_name="Stephen Lewis",
             website="https://github.com/monooso/claude-usage-gnome",
             issue_url="https://github.com/monooso/claude-usage-gnome/issues",
-            license_type=Gtk.License.MIT_X11,
+            license_type=Gtk.License.AGPL_3_0,
         )
         about.present(self.props.active_window)
