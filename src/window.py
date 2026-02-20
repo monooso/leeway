@@ -129,7 +129,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         self._session_row, self._session_bar = self._make_metric_row(
             "Usage", "—"
         )
-        self._session_reset_row = Adw.ActionRow(title="Resets in", subtitle="—")
+        self._session_reset_row, self._session_reset_label = self._make_reset_row("Resets in")
         session_group.add(self._session_row)
         session_group.add(self._session_reset_row)
         content_box.append(session_group)
@@ -139,7 +139,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         self._weekly_row, self._weekly_bar = self._make_metric_row(
             "Usage", "—"
         )
-        self._weekly_reset_row = Adw.ActionRow(title="Resets", subtitle="—")
+        self._weekly_reset_row, self._weekly_reset_label = self._make_reset_row("Resets")
         weekly_group.add(self._weekly_row)
         weekly_group.add(self._weekly_reset_row)
         content_box.append(weekly_group)
@@ -204,6 +204,17 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         row.add_suffix(bar)
         return row, bar
 
+    def _make_reset_row(
+        self, title: str
+    ) -> tuple[Adw.ActionRow, Gtk.Label]:
+        """Create an ActionRow with a suffix label for reset time."""
+        row = Adw.ActionRow(title=title)
+        label = Gtk.Label(label="—")
+        label.add_css_class("dim-label")
+        label.set_valign(Gtk.Align.CENTER)
+        row.add_suffix(label)
+        return row, label
+
     def _get_refresh_interval(self) -> int:
         """Get refresh interval from GSettings, with fallback."""
         try:
@@ -267,7 +278,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
             self._session_row.set_subtitle("—")
             self._session_bar.set_value(0)
 
-        self._session_reset_row.set_subtitle(
+        self._session_reset_label.set_label(
             _format_reset_time(data.session_resets_at)
         )
 
@@ -281,11 +292,11 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
             self._weekly_bar.set_value(0)
 
         if data.weekly_resets_at:
-            self._weekly_reset_row.set_subtitle(
+            self._weekly_reset_label.set_label(
                 data.weekly_resets_at.strftime("%a %d %b %H:%M UTC")
             )
         else:
-            self._weekly_reset_row.set_subtitle("—")
+            self._weekly_reset_label.set_label("—")
 
         # Opus
         if data.opus_pct is not None:
