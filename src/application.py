@@ -38,10 +38,10 @@ class Application(Adw.Application):
         win.present()
 
     def _on_preferences(self, _action, _param):
-        from preferences import PreferencesWindow
+        from preferences import PreferencesDialog
 
-        win = PreferencesWindow(transient_for=self.props.active_window)
-        win.present()
+        dialog = PreferencesDialog()
+        dialog.present(self.props.active_window)
 
     def _on_about(self, _action, _param):
         about = Adw.AboutDialog(

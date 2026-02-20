@@ -1,4 +1,4 @@
-"""Preferences window."""
+"""Preferences dialog."""
 
 import gi
 
@@ -16,14 +16,13 @@ from statusline import (
 )
 
 
-class PreferencesWindow(Adw.PreferencesWindow):
+class PreferencesDialog(Adw.PreferencesDialog):
     """Application preferences."""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.set_title("Preferences")
-        self.set_default_size(400, 480)
-        self.set_modal(True)
+        self.set_follows_content_size(True)
 
         settings = Gio.Settings.new(APP_ID)
 
