@@ -15,6 +15,10 @@
       Requires a Claude Pro or Max subscription with Claude Code.
       Not compatible with API key billing.
     </p>
+    <p>
+      This app relies on an undocumented Anthropic API endpoint and may
+      break if the endpoint changes or is removed.
+    </p>
   </description>
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
   <developer id="io.github.monooso">

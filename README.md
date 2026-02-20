@@ -6,6 +6,10 @@ A native GNOME desktop application for monitoring Claude AI usage and rate limit
 
 **Requires a Claude Pro or Max subscription with Claude Code.** This app tracks subscription rate limits, not API key billing. It authenticates via the Claude Code CLI OAuth credentials stored at `~/.claude/.credentials.json`.
 
+> [!NOTE]
+> This app relies on [an undocumented Anthropic API endpoint](https://codelynx.dev/posts/claude-code-usage-limits-statusline) used internally by Claude Code.
+> It has no official stability guarantees and may break without notice if Anthropic changes or removes the endpoint.
+
 ## Features
 
 - **Dashboard** — session (5-hour), weekly (7-day), and Opus usage at a glance
