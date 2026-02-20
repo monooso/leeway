@@ -9,10 +9,10 @@ from statusline import (
     CorruptSettingsError,
     generate_statusline_script,
     install_statusline,
-    remove_claude_code_settings,
+    remove_statusline_setting,
     STATUSLINE_SCRIPT_NAME,
     uninstall_statusline,
-    update_claude_code_settings,
+    update_statusline_setting,
 )
 
 
@@ -125,14 +125,14 @@ class TestUninstallStatusline:
         assert not script_path.exists()
 
 
-class TestUpdateClaudeCodeSettings:
-    """Tests for update_claude_code_settings()."""
+class TestUpdateStatuslineSetting:
+    """Tests for update_statusline_setting()."""
 
     def test_creates_settings_file_if_missing(self, tmp_path):
         settings_path = tmp_path / "settings.json"
         script_path = tmp_path / "statusline-command.sh"
 
-        update_claude_code_settings(settings_path, script_path)
+        update_statusline_setting(settings_path, script_path)
 
         data = json.loads(settings_path.read_text())
         assert "statusLine" in data
@@ -144,7 +144,7 @@ class TestUpdateClaudeCodeSettings:
         settings_path.write_text(json.dumps({"existingKey": "existingValue"}))
         script_path = tmp_path / "statusline-command.sh"
 
-        update_claude_code_settings(settings_path, script_path)
+        update_statusline_setting(settings_path, script_path)
 
         data = json.loads(settings_path.read_text())
         assert data["existingKey"] == "existingValue"
@@ -157,7 +157,7 @@ class TestUpdateClaudeCodeSettings:
         }))
         script_path = tmp_path / "statusline-command.sh"
 
-        update_claude_code_settings(settings_path, script_path)
+        update_statusline_setting(settings_path, script_path)
 
         data = json.loads(settings_path.read_text())
         assert str(script_path) in data["statusLine"]["command"]
@@ -168,11 +168,11 @@ class TestUpdateClaudeCodeSettings:
         script_path = tmp_path / "statusline-command.sh"
 
         with pytest.raises(CorruptSettingsError):
-            update_claude_code_settings(settings_path, script_path)
+            update_statusline_setting(settings_path, script_path)
 
 
-class TestRemoveClaudeCodeSettings:
-    """Tests for remove_claude_code_settings()."""
+class TestRemoveStatuslineSetting:
+    """Tests for remove_statusline_setting()."""
 
     def test_removes_statusline_key(self, tmp_path):
         settings_path = tmp_path / "settings.json"
@@ -181,7 +181,7 @@ class TestRemoveClaudeCodeSettings:
             "otherKey": 42,
         }))
 
-        remove_claude_code_settings(settings_path)
+        remove_statusline_setting(settings_path)
 
         data = json.loads(settings_path.read_text())
         assert "statusLine" not in data
@@ -191,12 +191,12 @@ class TestRemoveClaudeCodeSettings:
         settings_path = tmp_path / "settings.json"
         settings_path.write_text(json.dumps({"otherKey": 42}))
 
-        remove_claude_code_settings(settings_path)
+        remove_statusline_setting(settings_path)
 
         data = json.loads(settings_path.read_text())
         assert data == {"otherKey": 42}
 
     def test_noop_if_file_missing(self, tmp_path):
         settings_path = tmp_path / "settings.json"
-        remove_claude_code_settings(settings_path)
+        remove_statusline_setting(settings_path)
         assert not settings_path.exists()

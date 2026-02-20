@@ -182,7 +182,7 @@ def install_statusline(
     script_path.parent.mkdir(parents=True, exist_ok=True)
     script_path.write_text(generate_statusline_script())
     script_path.chmod(0o755)
-    update_claude_code_settings(settings_path, script_path)
+    update_statusline_setting(settings_path, script_path)
 
 
 def uninstall_statusline(
@@ -192,10 +192,10 @@ def uninstall_statusline(
     """Remove the statusline script and update Claude Code settings."""
     if script_path.exists():
         script_path.unlink()
-    remove_claude_code_settings(settings_path)
+    remove_statusline_setting(settings_path)
 
 
-def update_claude_code_settings(
+def update_statusline_setting(
     settings_path: Path,
     script_path: Path,
 ) -> None:
@@ -218,7 +218,7 @@ def update_claude_code_settings(
     settings_path.write_text(json.dumps(settings, indent=2) + "\n")
 
 
-def remove_claude_code_settings(settings_path: Path) -> None:
+def remove_statusline_setting(settings_path: Path) -> None:
     """Remove the statusLine entry from Claude Code settings.json."""
     if not settings_path.exists():
         return
