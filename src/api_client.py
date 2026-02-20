@@ -14,7 +14,10 @@ API_URL = "https://api.anthropic.com/api/oauth/usage"
 USER_AGENT = "claude-code/2.1.5"
 
 # Module-level session — reused across requests, avoids GC disposal warnings.
+# Short idle timeout prevents stale keep-alive connections from causing
+# "Socket I/O timed out" errors when the refresh interval elapses.
 _session = Soup.Session()
+_session.set_idle_timeout(10)
 
 
 class ApiError(Exception):
