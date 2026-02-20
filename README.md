@@ -2,7 +2,7 @@
 
 ![Claude Usage application screenshot](docs/claude-usage-screenshot.png)
 
-A native GNOME desktop application for monitoring Claude AI usage and rate limits. Displays session, weekly, and Opus utilisation with colour-coded progress bars, countdown timers, and desktop notifications.
+A native GNOME desktop application for monitoring Claude Code usage and rate limits. Displays session, weekly, and Opus utilisation with colour-coded progress bars, countdown timers, and desktop notifications.
 
 **Requires a Claude Pro or Max subscription with Claude Code.** This app tracks subscription rate limits, not API key billing. It authenticates via the Claude Code CLI OAuth credentials stored at `~/.claude/.credentials.json`.
 
