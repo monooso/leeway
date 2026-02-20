@@ -4,10 +4,10 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>AGPL-3.0-or-later</project_license>
   <name>Claude Usage</name>
-  <summary>Track Claude AI usage and rate limits</summary>
+  <summary>Track Claude Code usage and rate limits</summary>
   <description>
     <p>
-      Monitor your Claude AI session and weekly usage in real time.
+      Monitor your Claude Code session and weekly usage in real time.
       Colour-coded indicators show whether you are within safe limits
       or approaching a rate-limit reset.
     </p>
