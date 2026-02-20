@@ -1,0 +1,21 @@
+app-id: com.github.monooso.claude-usage-gnome
+runtime: org.gnome.Platform
+runtime-version: '49'
+sdk: org.gnome.Sdk
+command: claude-usage-gnome
+
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --filesystem=~/.claude:ro
+
+modules:
+  - name: claude-usage-gnome
+    buildsystem: meson
+    config-opts:
+      - -Dpython_path=/usr/bin/python3
+    sources:
+      - type: dir
+        path: .

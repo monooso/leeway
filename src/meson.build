@@ -1,4 +1,5 @@
 python_path = get_option('python_path')
+pkgdatadir = get_option('prefix') / get_option('datadir') / 'claude-usage-gnome'
 
 sources = files(
   'main.py',
@@ -12,14 +13,16 @@ sources = files(
   'statusline.py',
 )
 
-# Configure the launcher script with the correct python path and source dir
+install_data(sources, install_dir: pkgdatadir)
+
+# Configure the launcher script with the correct python path and installed source dir
 launcher_conf = configuration_data()
 launcher_conf.set('PYTHON', python_path)
-launcher_conf.set('SRCDIR', meson.current_source_dir())
+launcher_conf.set('PKGDATADIR', pkgdatadir)
 
 configure_file(
-  input: 'claude-usage.in',
-  output: 'claude-usage',
+  input: 'claude-usage-gnome.in',
+  output: 'claude-usage-gnome',
   configuration: launcher_conf,
   install: true,
   install_dir: get_option('bindir'),

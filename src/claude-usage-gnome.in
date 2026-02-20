@@ -1,0 +1,3 @@
+#!/bin/bash
+# Launcher for Claude Usage GNOME app
+exec @PYTHON@ @PKGDATADIR@/main.py "$@"
