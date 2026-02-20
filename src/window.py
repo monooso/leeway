@@ -14,7 +14,7 @@ from credential_reader import CredentialError, read_credentials
 from usage_calculator import color_for_pct
 from usage_model import UsageData
 
-APP_ID = "com.github.monooso.claude-usage-gnome"
+APP_ID = "io.github.monooso.claude-usage-gnome"
 
 
 def _format_reset_time(dt: datetime | None) -> str:

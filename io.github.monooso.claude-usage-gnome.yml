@@ -1,4 +1,4 @@
-app-id: com.github.monooso.claude-usage-gnome
+app-id: io.github.monooso.claude-usage-gnome
 runtime: org.gnome.Platform
 runtime-version: '49'
 sdk: org.gnome.Sdk

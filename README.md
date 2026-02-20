@@ -43,19 +43,19 @@ Then build and install the app:
 ```bash
 git clone https://github.com/monooso/claude-usage-gnome.git
 cd claude-usage-gnome
-flatpak-builder --user --install --force-clean _build com.github.monooso.claude-usage-gnome.yml
+flatpak-builder --user --install --force-clean _build io.github.monooso.claude-usage-gnome.yml
 ```
 
 Launch from the GNOME app grid, or from the terminal:
 
 ```bash
-flatpak run com.github.monooso.claude-usage-gnome
+flatpak run io.github.monooso.claude-usage-gnome
 ```
 
 To uninstall:
 
 ```bash
-flatpak uninstall --user com.github.monooso.claude-usage-gnome
+flatpak uninstall --user io.github.monooso.claude-usage-gnome
 ```
 
 ### Run from source

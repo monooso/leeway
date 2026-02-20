@@ -13,7 +13,18 @@
     </p>
   </description>
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
+  <developer id="io.github.monooso">
+    <name>Stephen Lewis</name>
+  </developer>
   <url type="homepage">https://github.com/monooso/claude-usage-gnome</url>
+  <url type="bugtracker">https://github.com/monooso/claude-usage-gnome/issues</url>
+  <url type="vcs-browser">https://github.com/monooso/claude-usage-gnome</url>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Dashboard showing session and weekly usage</caption>
+      <image>https://raw.githubusercontent.com/monooso/claude-usage-gnome/main/docs/claude-usage-screenshot.png</image>
+    </screenshot>
+  </screenshots>
   <content_rating type="oars-1.1" />
   <releases>
     <release version="0.1.0" date="2026-02-20">

@@ -15,7 +15,7 @@ class Application(Adw.Application):
 
     def __init__(self):
         super().__init__(
-            application_id="com.github.monooso.claude-usage-gnome",
+            application_id="io.github.monooso.claude-usage-gnome",
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
 
@@ -45,7 +45,7 @@ class Application(Adw.Application):
     def _on_about(self, _action, _param):
         about = Adw.AboutDialog(
             application_name="Claude Usage",
-            application_icon="com.github.monooso.claude-usage-gnome",
+            application_icon="io.github.monooso.claude-usage-gnome",
             version="0.1.0",
             developer_name="Stephen Lewis",
             website="https://github.com/monooso/claude-usage-gnome",

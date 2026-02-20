@@ -19,7 +19,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.set_default_size(400, 480)
         self.set_modal(True)
 
-        settings = Gio.Settings.new("com.github.monooso.claude-usage-gnome")
+        settings = Gio.Settings.new("io.github.monooso.claude-usage-gnome")
 
         # General page
         page = Adw.PreferencesPage(title="General", icon_name="preferences-system-symbolic")
