@@ -1,6 +1,6 @@
-# Claude Usage GNOME
+# Claude Usage
 
-![Claude Usage GNOME screenshot](docs/claude-usage-screenshot.png)
+![Claude Usage application screenshot](docs/claude-usage-screenshot.png)
 
 A native GNOME desktop application for monitoring Claude AI usage and rate limits. Displays session, weekly, and Opus utilisation with colour-coded progress bars, countdown timers, and desktop notifications.
 
