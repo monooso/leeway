@@ -1,12 +1,8 @@
 """Tests for statusline module."""
 
 import json
-import os
-import sys
 
 import pytest
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from statusline import (
     generate_statusline_script,
@@ -33,7 +29,6 @@ class TestGenerateStatuslineScript:
 
     def test_script_has_colour_gradient(self):
         script = generate_statusline_script()
-        # Should contain ANSI colour codes for the 10-level gradient
         assert "\\033[38;5;" in script
 
     def test_script_has_progress_bar(self):
@@ -43,6 +38,11 @@ class TestGenerateStatuslineScript:
 
     def test_script_name_is_correct(self):
         assert STATUSLINE_SCRIPT_NAME == "statusline-command.sh"
+
+    def test_script_pipes_via_stdin(self):
+        """Credentials and response should be piped via stdin, not interpolated."""
+        script = generate_statusline_script()
+        assert "sys.stdin" in script
 
 
 class TestUpdateClaudeCodeSettings:
@@ -110,6 +110,5 @@ class TestRemoveClaudeCodeSettings:
 
     def test_noop_if_file_missing(self, tmp_path):
         settings_path = tmp_path / "settings.json"
-        # Should not raise
         remove_claude_code_settings(settings_path)
         assert not settings_path.exists()

@@ -1,12 +1,5 @@
 """Tests for usage_calculator module."""
 
-import os
-import sys
-
-import pytest
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-
 from usage_calculator import StatusLevel, status_for_pct, color_for_status, color_for_pct
 
 
@@ -40,25 +33,21 @@ class TestColorForStatus:
 
     def test_safe_is_green(self):
         r, g, b = color_for_status(StatusLevel.SAFE)
-        # Green channel should dominate
         assert g > r
         assert g > b
 
     def test_moderate_is_amber(self):
         r, g, b = color_for_status(StatusLevel.MODERATE)
-        # Red and green both high, blue low (amber/yellow range)
         assert r > b
         assert g > b
 
     def test_critical_is_red(self):
         r, g, b = color_for_status(StatusLevel.CRITICAL)
-        # Red channel should dominate
         assert r > g
         assert r > b
 
     def test_unknown_is_grey(self):
         r, g, b = color_for_status(StatusLevel.UNKNOWN)
-        # All channels roughly equal (grey)
         assert abs(r - g) < 0.2
         assert abs(g - b) < 0.2
 

@@ -1,18 +1,12 @@
 """Tests for credential_reader module."""
 
 import json
-import os
-import tempfile
 import time
 from pathlib import Path
 
 import pytest
 
-import sys
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-
-from credential_reader import Credentials, read_credentials, CredentialError
+from credential_reader import Credentials, read_credentials, CredentialError, DEFAULT_CREDENTIALS_PATH
 
 
 class TestReadCredentials:
@@ -77,7 +71,7 @@ class TestReadCredentials:
             "claudeAiOauth": {
                 "accessToken": "sk-ant-oat01-expired",
                 "refreshToken": "sk-ant-ort01-test",
-                "expiresAt": int(time.time() * 1000) - 1000,  # Already expired
+                "expiresAt": int(time.time() * 1000) - 1000,
                 "subscriptionType": "max",
                 "rateLimitTier": "default_claude_max_5x",
             }
@@ -103,7 +97,5 @@ class TestReadCredentials:
 
     def test_uses_default_path(self):
         """read_credentials() without arguments uses ~/.claude/.credentials.json."""
-        # Just verify the default path is constructed correctly
-        from credential_reader import DEFAULT_CREDENTIALS_PATH
         expected = Path.home() / ".claude" / ".credentials.json"
         assert DEFAULT_CREDENTIALS_PATH == expected

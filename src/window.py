@@ -7,12 +7,15 @@ gi.require_version("Adw", "1")
 
 from datetime import datetime, timezone
 
-from gi.repository import Adw, Gdk, Gio, GLib, Gtk
+from gi.repository import Adw, Gio, GLib, Gtk
 
 from api_client import fetch_usage
 from credential_reader import CredentialError, read_credentials
 from usage_calculator import color_for_pct
 from usage_model import UsageData
+
+APP_ID = "com.github.monooso.claude-usage-gnome"
+
 
 def _format_reset_time(dt: datetime | None) -> str:
     """Format a reset datetime as a human-readable countdown or timestamp."""
@@ -33,20 +36,30 @@ def _format_reset_time(dt: datetime | None) -> str:
         return f"{days}d {hours % 24}h"
     if hours > 0:
         return f"{hours}h {minutes}m"
-    return f"{minutes}m"
+    if minutes > 0:
+        return f"{minutes}m"
+    return "< 1m"
 
 
 def _apply_color_to_bar(bar: Gtk.LevelBar, pct: float | None):
     """Apply a CSS colour to a LevelBar based on usage percentage."""
+    # Remove previous provider if we stored one
+    old_provider = getattr(bar, "_css_provider", None)
+    if old_provider is not None:
+        Gtk.StyleContext.remove_provider_for_display(
+            bar.get_display(), old_provider
+        )
+
     r, g, b = color_for_pct(pct)
     css = f"""levelbar block.filled {{
         background-color: rgba({int(r*255)}, {int(g*255)}, {int(b*255)}, 1.0);
     }}"""
     provider = Gtk.CssProvider()
     provider.load_from_string(css)
-    bar.get_style_context().add_provider(
-        provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    Gtk.StyleContext.add_provider_for_display(
+        bar.get_display(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
     )
+    bar._css_provider = provider
 
 
 class ClaudeUsageWindow(Adw.ApplicationWindow):
@@ -55,7 +68,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.set_title("Claude Usage")
-        self.set_default_size(420, 580)
+        self.set_default_size(420, -1)
 
         self._timer_id = None
         self._notification_tracker = set()
@@ -81,7 +94,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         toolbar_view.add_top_bar(header)
 
         # Scrollable content
-        scroll = Gtk.ScrolledWindow(vexpand=True)
+        scroll = Gtk.ScrolledWindow(vexpand=True, propagate_natural_height=True)
         toolbar_view.set_content(scroll)
 
         content_box = Gtk.Box(
@@ -93,20 +106,6 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
             margin_end=24,
         )
         scroll.set_child(content_box)
-
-        # Status icon + title
-        title_box = Gtk.Box(
-            orientation=Gtk.Orientation.VERTICAL,
-            spacing=8,
-            halign=Gtk.Align.CENTER,
-        )
-        title_label = Gtk.Label(label="Claude Usage")
-        title_label.add_css_class("title-1")
-        title_box.append(title_label)
-        self._status_label = Gtk.Label(label="Loading…")
-        self._status_label.add_css_class("dim-label")
-        title_box.append(self._status_label)
-        content_box.append(title_box)
 
         # Session usage group
         session_group = Adw.PreferencesGroup(title="Session (5-hour)")
@@ -138,14 +137,28 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         content_box.append(opus_group)
         self._opus_group = opus_group
 
-        # Last updated
-        self._updated_label = Gtk.Label(
-            label="",
+        # Status + last updated
+        footer_box = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL,
+            spacing=8,
             halign=Gtk.Align.CENTER,
+            margin_top=12,
         )
+        self._status_label = Gtk.Label(label="Loading…")
+        self._status_label.add_css_class("dim-label")
+        self._status_label.add_css_class("caption")
+        footer_box.append(self._status_label)
+
+        self._updated_label = Gtk.Label(label="")
         self._updated_label.add_css_class("dim-label")
         self._updated_label.add_css_class("caption")
-        content_box.append(self._updated_label)
+        footer_box.append(self._updated_label)
+
+        content_box.append(footer_box)
+
+        # Listen for settings changes to restart the timer
+        self._settings = Gio.Settings.new(APP_ID)
+        self._settings.connect("changed::refresh-interval", self._on_interval_changed)
 
         # Initial fetch
         self._refresh()
@@ -177,10 +190,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
     def _get_refresh_interval(self) -> int:
         """Get refresh interval from GSettings, with fallback."""
         try:
-            from gi.repository import Gio
-
-            settings = Gio.Settings.new("com.github.monooso.claude-usage-gnome")
-            return max(15, min(300, settings.get_uint("refresh-interval")))
+            return max(15, min(300, self._settings.get_uint("refresh-interval")))
         except Exception:
             return 60
 
@@ -190,6 +200,10 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
             GLib.source_remove(self._timer_id)
         interval = self._get_refresh_interval()
         self._timer_id = GLib.timeout_add_seconds(interval, self._on_timer)
+
+    def _on_interval_changed(self, _settings, _key):
+        """Restart the timer when the refresh interval changes."""
+        self._start_timer()
 
     def _on_timer(self) -> bool:
         """Timer callback. Returns True to keep the timer running."""
@@ -202,6 +216,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
     def _refresh(self):
         """Read credentials and fetch usage data."""
         self._status_label.set_text("Refreshing…")
+        self._updated_label.set_text("")
 
         try:
             creds = read_credentials()
@@ -264,14 +279,15 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         else:
             self._opus_group.set_visible(False)
 
-        # Status + timestamp
-        self._status_label.set_text("Connected")
-        now = datetime.now().strftime("%H:%M:%S")
-        self._updated_label.set_text(f"Last updated: {now}")
+        # Footer
+        self._status_label.set_text("Connected ·")
+        now = datetime.now(timezone.utc).astimezone().strftime("%H:%M:%S")
+        self._updated_label.set_text(f"Updated {now}")
 
     def _show_error(self, message: str):
         """Display an error message in the status label."""
         self._status_label.set_text(f"Error: {message}")
+        self._updated_label.set_text("")
 
     def _check_notifications(self, data: UsageData):
         """Send desktop notifications at configured thresholds."""
@@ -279,15 +295,12 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
             return
 
         try:
-            from gi.repository import Gio
-
-            settings = Gio.Settings.new("com.github.monooso.claude-usage-gnome")
             thresholds = []
-            if settings.get_boolean("notify-at-75"):
+            if self._settings.get_boolean("notify-at-75"):
                 thresholds.append(75)
-            if settings.get_boolean("notify-at-90"):
+            if self._settings.get_boolean("notify-at-90"):
                 thresholds.append(90)
-            if settings.get_boolean("notify-at-95"):
+            if self._settings.get_boolean("notify-at-95"):
                 thresholds.append(95)
         except Exception:
             thresholds = [75, 90, 95]
@@ -299,13 +312,15 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         for threshold in thresholds:
             if data.session_pct >= threshold and threshold not in self._notification_tracker:
                 self._notification_tracker.add(threshold)
-                from gi.repository import Gio
+
+                reset_text = _format_reset_time(data.session_resets_at)
+                if reset_text == "now":
+                    body = f"Session usage has reached {threshold} %. Resets now."
+                else:
+                    body = f"Session usage has reached {threshold} %. Resets in {reset_text}."
 
                 notification = Gio.Notification.new(f"Claude Usage: {data.session_pct:.0f} %")
-                notification.set_body(
-                    f"Session usage has reached {threshold} %. "
-                    f"Resets {_format_reset_time(data.session_resets_at)}."
-                )
+                notification.set_body(body)
                 app.send_notification(f"threshold-{threshold}", notification)
 
         # Reset tracker when usage drops (after a reset)

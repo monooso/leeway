@@ -6,11 +6,12 @@ import gi
 
 gi.require_version("Soup", "3.0")
 
-from gi.repository import GLib, Gio, Soup
+from gi.repository import GLib, Soup
 
 from usage_model import UsageData, parse_usage_response
 
 API_URL = "https://api.anthropic.com/api/oauth/usage"
+USER_AGENT = "claude-code/2.1.5"
 
 # Module-level session — reused across requests, avoids GC disposal warnings.
 _session = Soup.Session()
@@ -25,7 +26,7 @@ def build_request_headers(access_token: str) -> dict[str, str]:
     return {
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json",
-        "User-Agent": "claude-code/2.1.5",
+        "User-Agent": USER_AGENT,
         "anthropic-beta": "oauth-2025-04-20",
     }
 
@@ -71,9 +72,9 @@ def fetch_usage(access_token: str, callback):
             return
 
         status = message.get_status()
-        if status != 200:
-            reason = message.get_reason_phrase()
-            callback(None, f"API returned {status}: {reason}")
+        if status != Soup.Status.OK:
+            phrase = Soup.Status.get_phrase(status)
+            callback(None, f"API returned {int(status)}: {phrase}")
             return
 
         try:

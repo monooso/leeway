@@ -1,12 +1,6 @@
 """Tests for usage_model module."""
 
-import os
-import sys
 from datetime import datetime, timezone
-
-import pytest
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from usage_model import UsageData, parse_usage_response
 

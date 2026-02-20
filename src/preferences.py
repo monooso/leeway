@@ -75,9 +75,14 @@ class PreferencesWindow(Adw.PreferencesWindow):
         statusline_group.add(statusline_row)
 
     def _on_statusline_toggled(self, row, _param):
-        if row.get_active():
-            install_statusline()
-            row.set_subtitle(str(DEFAULT_SCRIPT_PATH))
-        else:
-            uninstall_statusline()
-            row.set_subtitle("Installs a bash script to ~/.claude/")
+        try:
+            if row.get_active():
+                install_statusline()
+                row.set_subtitle(str(DEFAULT_SCRIPT_PATH))
+            else:
+                uninstall_statusline()
+                row.set_subtitle("Installs a bash script to ~/.claude/")
+        except OSError as exc:
+            row.set_active(not row.get_active())
+            toast = Adw.Toast(title=f"Statusline error: {exc}")
+            self.add_toast(toast)

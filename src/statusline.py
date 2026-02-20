@@ -3,6 +3,8 @@
 import json
 from pathlib import Path
 
+from api_client import USER_AGENT
+
 STATUSLINE_SCRIPT_NAME = "statusline-command.sh"
 
 CLAUDE_DIR = Path.home() / ".claude"
@@ -61,30 +63,30 @@ fi
 usage_text=""
 
 if [ -f "$CRED_FILE" ]; then
-    # Extract access token using python3 (always available on the system)
+    # Extract access token by piping the file to python3 via stdin
     token=$(/usr/bin/python3 -c "
 import json, sys
 try:
-    d = json.load(open('$CRED_FILE'))
+    d = json.load(sys.stdin)
     print(d['claudeAiOauth']['accessToken'])
 except Exception:
     sys.exit(1)
-" 2>/dev/null)
+" < "$CRED_FILE" 2>/dev/null)
 
     if [ -n "$token" ]; then
         response=$(curl -s --max-time 5 \
             -H "Authorization: Bearer $token" \
             -H "Content-Type: application/json" \
-            -H "User-Agent: claude-code/2.1.5" \
+            -H "User-Agent: """ + USER_AGENT + r"""" \
             -H "anthropic-beta: oauth-2025-04-20" \
             "https://api.anthropic.com/api/oauth/usage" 2>/dev/null)
 
         if [ -n "$response" ]; then
-            # Parse with python3
-            read -r utilization resets_at <<< "$(/usr/bin/python3 -c "
+            # Parse by piping response to python3 via stdin
+            read -r utilization resets_at <<< "$(echo "$response" | /usr/bin/python3 -c "
 import json, sys
 try:
-    d = json.loads('''$response''')
+    d = json.load(sys.stdin)
     fh = d.get('five_hour', {})
     pct = fh.get('utilization_pct', fh.get('utilization', ''))
     resets = fh.get('resets_at', '')

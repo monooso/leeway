@@ -5,9 +5,10 @@ import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
-from gi.repository import Adw, Gio, GLib
+from gi.repository import Adw, Gio, Gtk
 
 from window import ClaudeUsageWindow
+
 
 class Application(Adw.Application):
     """Main application class."""
@@ -52,6 +53,3 @@ class Application(Adw.Application):
             license_type=Gtk.License.MIT_X11,
         )
         about.present(self.props.active_window)
-
-# Need Gtk imported for License enum
-from gi.repository import Gtk  # noqa: E402

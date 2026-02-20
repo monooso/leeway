@@ -1,20 +1,10 @@
 """Tests for api_client module."""
 
 import json
-import os
-import sys
-from unittest.mock import MagicMock, patch
 
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-
-from api_client import (
-    API_URL,
-    ApiError,
-    build_request_headers,
-    parse_response_body,
-)
+from api_client import API_URL, ApiError, USER_AGENT, build_request_headers, parse_response_body
 from usage_model import UsageData
 
 
@@ -31,7 +21,7 @@ class TestBuildRequestHeaders:
 
     def test_includes_user_agent(self):
         headers = build_request_headers("token")
-        assert "claude-code" in headers["User-Agent"]
+        assert headers["User-Agent"] == USER_AGENT
 
     def test_includes_anthropic_beta(self):
         headers = build_request_headers("token")
