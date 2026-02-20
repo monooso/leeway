@@ -6,6 +6,10 @@ from pathlib import Path
 from config import APP_ID
 
 
+class BrokenSymlinkError(Exception):
+    """Raised when settings.json is a symlink whose target is inaccessible."""
+
+
 class CorruptSettingsError(Exception):
     """Raised when settings.json exists but contains invalid JSON."""
 
@@ -195,11 +199,22 @@ def uninstall_statusline(
     remove_statusline_setting(settings_path)
 
 
+def _check_broken_symlink(settings_path: Path) -> None:
+    """Raise if settings_path is a symlink whose target is inaccessible."""
+    if settings_path.is_symlink() and not settings_path.exists():
+        target = settings_path.resolve()
+        raise BrokenSymlinkError(
+            f"{settings_path} is a symlink to {target}, which is not accessible. "
+            f"In a Flatpak sandbox, symlink targets outside ~/.claude/ cannot be followed."
+        )
+
+
 def update_statusline_setting(
     settings_path: Path,
     script_path: Path,
 ) -> None:
     """Add or update the statusLine entry in Claude Code settings.json."""
+    _check_broken_symlink(settings_path)
     settings: dict = {}
     if settings_path.exists():
         try:
@@ -220,6 +235,7 @@ def update_statusline_setting(
 
 def remove_statusline_setting(settings_path: Path) -> None:
     """Remove the statusLine entry from Claude Code settings.json."""
+    _check_broken_symlink(settings_path)
     if not settings_path.exists():
         return
 

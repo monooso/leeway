@@ -9,6 +9,7 @@ from gi.repository import Adw, Gio
 
 from config import APP_ID
 from statusline import (
+    BrokenSymlinkError,
     CorruptSettingsError,
     DEFAULT_SCRIPT_PATH,
     install_statusline,
@@ -89,7 +90,7 @@ class PreferencesDialog(Adw.PreferencesDialog):
             else:
                 uninstall_statusline()
                 row.set_subtitle("Installs a bash script to ~/.claude/")
-        except (OSError, CorruptSettingsError) as exc:
+        except (OSError, BrokenSymlinkError, CorruptSettingsError) as exc:
             # Block the signal to avoid re-entrant calls while reverting.
             row.handler_block(self._statusline_handler_id)
             row.set_active(not row.get_active())

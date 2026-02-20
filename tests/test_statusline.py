@@ -6,6 +6,7 @@ import stat
 import pytest
 
 from statusline import (
+    BrokenSymlinkError,
     CorruptSettingsError,
     generate_statusline_script,
     install_statusline,
@@ -170,6 +171,14 @@ class TestUpdateStatuslineSetting:
         with pytest.raises(CorruptSettingsError):
             update_statusline_setting(settings_path, script_path)
 
+    def test_raises_on_broken_symlink(self, tmp_path):
+        settings_path = tmp_path / "settings.json"
+        settings_path.symlink_to("/nonexistent/target/settings.json")
+        script_path = tmp_path / "statusline-command.sh"
+
+        with pytest.raises(BrokenSymlinkError):
+            update_statusline_setting(settings_path, script_path)
+
 
 class TestRemoveStatuslineSetting:
     """Tests for remove_statusline_setting()."""
@@ -200,3 +209,10 @@ class TestRemoveStatuslineSetting:
         settings_path = tmp_path / "settings.json"
         remove_statusline_setting(settings_path)
         assert not settings_path.exists()
+
+    def test_raises_on_broken_symlink(self, tmp_path):
+        settings_path = tmp_path / "settings.json"
+        settings_path.symlink_to("/nonexistent/target/settings.json")
+
+        with pytest.raises(BrokenSymlinkError):
+            remove_statusline_setting(settings_path)
