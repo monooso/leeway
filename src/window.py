@@ -14,7 +14,6 @@ from credential_reader import CredentialError, read_credentials
 from usage_calculator import color_for_pct
 from usage_model import UsageData
 
-
 def _format_reset_time(dt: datetime | None) -> str:
     """Format a reset datetime as a human-readable countdown or timestamp."""
     if dt is None:
@@ -56,7 +55,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.set_title("Claude Usage")
-        self.set_default_size(420, 520)
+        self.set_default_size(420, 580)
 
         self._timer_id = None
         self._notification_tracker = set()
@@ -135,6 +134,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
             "Usage", "—"
         )
         opus_group.add(self._opus_row)
+        opus_group.set_visible(False)
         content_box.append(opus_group)
         self._opus_group = opus_group
 
@@ -179,7 +179,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         try:
             from gi.repository import Gio
 
-            settings = Gio.Settings.new("com.github.sl.claude-usage")
+            settings = Gio.Settings.new("com.github.monooso.claude-usage-gnome")
             return max(15, min(300, settings.get_uint("refresh-interval")))
         except Exception:
             return 60
@@ -281,7 +281,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         try:
             from gi.repository import Gio
 
-            settings = Gio.Settings.new("com.github.sl.claude-usage")
+            settings = Gio.Settings.new("com.github.monooso.claude-usage-gnome")
             thresholds = []
             if settings.get_boolean("notify-at-75"):
                 thresholds.append(75)

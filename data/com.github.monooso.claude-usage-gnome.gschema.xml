@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="claude-usage">
-  <schema id="com.github.sl.claude-usage" path="/com/github/sl/claude-usage/">
+  <schema id="com.github.monooso.claude-usage-gnome" path="/com/github/sl/claude-usage/">
 
     <key name="refresh-interval" type="u">
       <default>60</default>

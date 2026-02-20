@@ -6,7 +6,7 @@ export GSETTINGS_SCHEMA_DIR="$SCRIPT_DIR/data"
 
 # Compile the GSettings schema if needed
 if [ ! -f "$GSETTINGS_SCHEMA_DIR/gschemas.compiled" ] || \
-   [ "$GSETTINGS_SCHEMA_DIR/com.github.sl.claude-usage.gschema.xml" -nt "$GSETTINGS_SCHEMA_DIR/gschemas.compiled" ]; then
+   [ "$GSETTINGS_SCHEMA_DIR/com.github.monooso.claude-usage-gnome.gschema.xml" -nt "$GSETTINGS_SCHEMA_DIR/gschemas.compiled" ]; then
     glib-compile-schemas "$GSETTINGS_SCHEMA_DIR"
 fi
 

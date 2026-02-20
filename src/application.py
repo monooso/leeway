@@ -9,13 +9,12 @@ from gi.repository import Adw, Gio, GLib
 
 from window import ClaudeUsageWindow
 
-
 class Application(Adw.Application):
     """Main application class."""
 
     def __init__(self):
         super().__init__(
-            application_id="com.github.sl.claude-usage",
+            application_id="com.github.monooso.claude-usage-gnome",
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
 
@@ -45,15 +44,14 @@ class Application(Adw.Application):
     def _on_about(self, _action, _param):
         about = Adw.AboutDialog(
             application_name="Claude Usage",
-            application_icon="com.github.sl.claude-usage",
+            application_icon="com.github.monooso.claude-usage-gnome",
             version="0.1.0",
-            developer_name="Stephen Lumenta",
-            website="https://github.com/sl/claude-usage-gnome",
-            issue_url="https://github.com/sl/claude-usage-gnome/issues",
+            developer_name="Stephen Lewis",
+            website="https://github.com/monooso/claude-usage-gnome",
+            issue_url="https://github.com/monooso/claude-usage-gnome/issues",
             license_type=Gtk.License.MIT_X11,
         )
         about.present(self.props.active_window)
-
 
 # Need Gtk imported for License enum
 from gi.repository import Gtk  # noqa: E402
