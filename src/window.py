@@ -33,7 +33,7 @@ def _format_reset_time(dt: datetime | None, *, now: datetime | None = None) -> s
 
     if hours >= 24:
         days = hours // 24
-        return f"{days}d {hours % 24}h"
+        return f"{days}d {hours % 24}h {minutes}m"
     if hours > 0:
         return f"{hours}h {minutes}m"
     if minutes > 0:
@@ -223,7 +223,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         """Get refresh interval from GSettings, with fallback."""
         try:
             return max(15, min(300, self._settings.get_uint("refresh-interval")))
-        except Exception:
+        except GLib.Error:
             return 60
 
     def _start_timer(self):
@@ -312,11 +312,9 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
             self._weekly_row.set_subtitle("\u2014")
             self._weekly_bar.set_value(0)
 
-        if data.weekly_resets_at:
-            local_reset = data.weekly_resets_at.astimezone()
-            self._weekly_reset_label.set_label(
-                f"Resets {local_reset.strftime('%a %d %b %H:%M')}"
-            )
+        weekly_reset_text = _format_reset_time(data.weekly_resets_at)
+        if data.weekly_resets_at is not None:
+            self._weekly_reset_label.set_label(f"Resets in {weekly_reset_text}")
         else:
             self._weekly_reset_label.set_label("")
 
@@ -355,7 +353,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
                 thresholds.append(90)
             if self._settings.get_boolean("notify-at-95"):
                 thresholds.append(95)
-        except Exception:
+        except GLib.Error:
             thresholds = [75, 90, 95]
 
         app = self.get_application()

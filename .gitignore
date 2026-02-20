@@ -3,6 +3,7 @@ build/
 __pycache__/
 *.pyc
 data/gschemas.compiled
+src/config.py
 .venv
 .flatpak-builder/
 _build/

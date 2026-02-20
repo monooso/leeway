@@ -1,7 +1,6 @@
 """Tests for window module — pure functions only."""
 
 from datetime import datetime, timedelta, timezone
-from unittest.mock import patch
 
 from window import _format_reset_time, _truncate_error
 
@@ -35,19 +34,22 @@ class TestFormatResetTime:
         assert _format_reset_time(_future(3 * 3600 + 15 * 60), now=NOW) == "3h 15m"
 
     def test_days_and_hours(self):
-        assert _format_reset_time(_future(2 * 86400 + 5 * 3600), now=NOW) == "2d 5h"
+        assert _format_reset_time(_future(2 * 86400 + 5 * 3600), now=NOW) == "2d 5h 0m"
 
     def test_exactly_one_minute(self):
         assert _format_reset_time(_future(60), now=NOW) == "1m"
 
     def test_exactly_24_hours_shows_days(self):
-        assert _format_reset_time(_future(24 * 3600), now=NOW) == "1d 0h"
+        assert _format_reset_time(_future(24 * 3600), now=NOW) == "1d 0h 0m"
 
     def test_24_hours_30_minutes(self):
-        assert _format_reset_time(_future(24 * 3600 + 30 * 60), now=NOW) == "1d 0h"
+        assert _format_reset_time(_future(24 * 3600 + 30 * 60), now=NOW) == "1d 0h 30m"
 
     def test_over_24_hours(self):
-        assert _format_reset_time(_future(25 * 3600), now=NOW) == "1d 1h"
+        assert _format_reset_time(_future(25 * 3600), now=NOW) == "1d 1h 0m"
+
+    def test_days_hours_and_minutes(self):
+        assert _format_reset_time(_future(2 * 86400 + 5 * 3600 + 17 * 60), now=NOW) == "2d 5h 17m"
 
     def test_defaults_to_real_time_when_now_omitted(self):
         """Without now= kwarg, uses the real clock (smoke test)."""
