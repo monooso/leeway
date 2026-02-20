@@ -24,6 +24,15 @@ def _parse_iso_datetime(value: str | None) -> datetime | None:
     return datetime.fromisoformat(text)
 
 
+def _get_pct(bucket: dict) -> float | None:
+    """Get the utilisation percentage, trying both field names."""
+    # The API uses "utilization_pct" in some responses and "utilization" in others.
+    pct = bucket.get("utilization_pct")
+    if pct is None:
+        pct = bucket.get("utilization")
+    return pct
+
+
 def parse_usage_response(raw: dict) -> UsageData:
     """Parse the API JSON response into a UsageData instance.
 
@@ -38,10 +47,10 @@ def parse_usage_response(raw: dict) -> UsageData:
     seven_day_opus = raw.get("seven_day_opus")
 
     return UsageData(
-        session_pct=five_hour.get("utilization_pct"),
+        session_pct=_get_pct(five_hour),
         session_resets_at=_parse_iso_datetime(five_hour.get("resets_at")),
-        weekly_pct=seven_day.get("utilization_pct"),
+        weekly_pct=_get_pct(seven_day),
         weekly_resets_at=_parse_iso_datetime(seven_day.get("resets_at")),
-        opus_pct=seven_day_opus.get("utilization_pct") if seven_day_opus else None,
+        opus_pct=_get_pct(seven_day_opus) if seven_day_opus else None,
         opus_resets_at=_parse_iso_datetime(seven_day_opus.get("resets_at")) if seven_day_opus else None,
     )

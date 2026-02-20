@@ -12,6 +12,9 @@ from usage_model import UsageData, parse_usage_response
 
 API_URL = "https://api.anthropic.com/api/oauth/usage"
 
+# Module-level session — reused across requests, avoids GC disposal warnings.
+_session = Soup.Session()
+
 
 class ApiError(Exception):
     """Raised when an API request fails."""
@@ -53,7 +56,6 @@ def fetch_usage(access_token: str, callback):
             On success: callback(data, None).
             On failure: callback(None, error_message).
     """
-    session = Soup.Session()
     message = Soup.Message.new("GET", API_URL)
 
     headers = build_request_headers(access_token)
@@ -63,7 +65,7 @@ def fetch_usage(access_token: str, callback):
 
     def on_response(_session, result):
         try:
-            input_stream = session.send_finish(result)
+            gbytes = _session.send_and_read_finish(result)
         except GLib.Error as exc:
             callback(None, f"HTTP request failed: {exc.message}")
             return
@@ -74,10 +76,8 @@ def fetch_usage(access_token: str, callback):
             callback(None, f"API returned {status}: {reason}")
             return
 
-        # Read the full response body
         try:
-            bytes_obj = Gio.InputStream.read_bytes(input_stream, 1024 * 1024, None)
-            body = bytes_obj.get_data().decode("utf-8")
+            body = gbytes.get_data().decode("utf-8")
         except Exception as exc:
             callback(None, f"Failed to read response: {exc}")
             return
@@ -90,4 +90,4 @@ def fetch_usage(access_token: str, callback):
 
         callback(data, None)
 
-    session.send_async(message, GLib.PRIORITY_DEFAULT, None, on_response)
+    _session.send_and_read_async(message, GLib.PRIORITY_DEFAULT, None, on_response)

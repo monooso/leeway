@@ -102,3 +102,23 @@ class TestParseUsageResponse:
 
         assert data.session_pct == 45.7
         assert data.weekly_pct == 62.3
+
+    def test_falls_back_to_utilization_field(self):
+        """When utilization_pct is absent, use utilization instead."""
+        raw = {
+            "five_hour": {
+                "utilization": 44.0,
+                "resets_at": "2026-02-20T17:00:00+00:00",
+            },
+            "seven_day": {
+                "utilization": 15.0,
+                "resets_at": "2026-02-25T23:00:00+00:00",
+            },
+            "seven_day_opus": None,
+        }
+
+        data = parse_usage_response(raw)
+
+        assert data.session_pct == 44.0
+        assert data.weekly_pct == 15.0
+        assert data.opus_pct is None

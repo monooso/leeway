@@ -7,7 +7,7 @@ gi.require_version("Adw", "1")
 
 from datetime import datetime, timezone
 
-from gi.repository import Adw, Gdk, GLib, Gtk
+from gi.repository import Adw, Gdk, Gio, GLib, Gtk
 
 from api_client import fetch_usage
 from credential_reader import CredentialError, read_credentials
@@ -73,7 +73,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         header.pack_start(refresh_btn)
 
         menu_btn = Gtk.MenuButton(icon_name="open-menu-symbolic", tooltip_text="Menu")
-        menu = GLib.Menu()
+        menu = Gio.Menu()
         menu.append("Preferences", "app.preferences")
         menu.append("About", "app.about")
         menu_btn.set_menu_model(menu)
