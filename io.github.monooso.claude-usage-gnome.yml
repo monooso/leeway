@@ -9,7 +9,7 @@ finish-args:
   - --share=ipc
   - --socket=fallback-x11
   - --socket=wayland
-  - --filesystem=~/.claude:ro
+  - --filesystem=~/.claude
 
 modules:
   - name: claude-usage-gnome

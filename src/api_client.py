@@ -6,12 +6,13 @@ import gi
 
 gi.require_version("Soup", "3.0")
 
-from gi.repository import GLib, Soup
+from gi.repository import Gio, GLib, Soup
 
+from config import APP_ID, VERSION
 from usage_model import UsageData, parse_usage_response
 
 API_URL = "https://api.anthropic.com/api/oauth/usage"
-USER_AGENT = "claude-code/2.1.5"
+USER_AGENT = f"{APP_ID}/{VERSION}"
 
 # Module-level session — reused across requests, avoids GC disposal warnings.
 # Short idle timeout prevents stale keep-alive connections from causing
@@ -28,7 +29,6 @@ def build_request_headers(access_token: str) -> dict[str, str]:
     """Build the HTTP headers for the usage endpoint."""
     return {
         "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/json",
         "User-Agent": USER_AGENT,
         "anthropic-beta": "oauth-2025-04-20",
     }
@@ -51,7 +51,7 @@ def parse_response_body(body: str) -> UsageData:
     return parse_usage_response(raw)
 
 
-def fetch_usage(access_token: str, callback):
+def fetch_usage(access_token: str, callback, cancellable: Gio.Cancellable | None = None):
     """Fetch usage data asynchronously using libsoup3.
 
     Args:
@@ -59,6 +59,7 @@ def fetch_usage(access_token: str, callback):
         callback: Called with (UsageData | None, str | None).
             On success: callback(data, None).
             On failure: callback(None, error_message).
+        cancellable: Optional GCancellable to abort the request.
     """
     message = Soup.Message.new("GET", API_URL)
 
@@ -71,6 +72,9 @@ def fetch_usage(access_token: str, callback):
         try:
             gbytes = _session.send_and_read_finish(result)
         except GLib.Error as exc:
+            # Silently ignore cancellation — the window is closing.
+            if exc.matches(Gio.io_error_quark(), Gio.IOErrorEnum.CANCELLED):
+                return
             callback(None, f"HTTP request failed: {exc.message}")
             return
 
@@ -94,4 +98,4 @@ def fetch_usage(access_token: str, callback):
 
         callback(data, None)
 
-    _session.send_and_read_async(message, GLib.PRIORITY_DEFAULT, None, on_response)
+    _session.send_and_read_async(message, GLib.PRIORITY_DEFAULT, cancellable, on_response)

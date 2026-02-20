@@ -1,14 +1,18 @@
 """Tests for statusline module."""
 
 import json
+import stat
 
 import pytest
 
 from statusline import (
+    CorruptSettingsError,
     generate_statusline_script,
-    update_claude_code_settings,
+    install_statusline,
     remove_claude_code_settings,
     STATUSLINE_SCRIPT_NAME,
+    uninstall_statusline,
+    update_claude_code_settings,
 )
 
 
@@ -33,8 +37,8 @@ class TestGenerateStatuslineScript:
 
     def test_script_has_progress_bar(self):
         script = generate_statusline_script()
-        assert "▓" in script
-        assert "░" in script
+        assert "\u2593" in script
+        assert "\u2591" in script
 
     def test_script_name_is_correct(self):
         assert STATUSLINE_SCRIPT_NAME == "statusline-command.sh"
@@ -43,6 +47,82 @@ class TestGenerateStatuslineScript:
         """Credentials and response should be piped via stdin, not interpolated."""
         script = generate_statusline_script()
         assert "sys.stdin" in script
+
+
+class TestInstallStatusline:
+    """Tests for install_statusline()."""
+
+    def test_creates_script_file(self, tmp_path):
+        script_path = tmp_path / "statusline-command.sh"
+        settings_path = tmp_path / "settings.json"
+
+        install_statusline(script_path=script_path, settings_path=settings_path)
+
+        assert script_path.exists()
+        assert script_path.read_text().startswith("#!/bin/bash")
+
+    def test_script_is_executable(self, tmp_path):
+        script_path = tmp_path / "statusline-command.sh"
+        settings_path = tmp_path / "settings.json"
+
+        install_statusline(script_path=script_path, settings_path=settings_path)
+
+        mode = script_path.stat().st_mode
+        assert mode & stat.S_IXUSR
+
+    def test_updates_settings_file(self, tmp_path):
+        script_path = tmp_path / "statusline-command.sh"
+        settings_path = tmp_path / "settings.json"
+
+        install_statusline(script_path=script_path, settings_path=settings_path)
+
+        data = json.loads(settings_path.read_text())
+        assert "statusLine" in data
+
+    def test_creates_parent_directories(self, tmp_path):
+        script_path = tmp_path / "sub" / "dir" / "statusline-command.sh"
+        settings_path = tmp_path / "settings.json"
+
+        install_statusline(script_path=script_path, settings_path=settings_path)
+
+        assert script_path.exists()
+
+
+class TestUninstallStatusline:
+    """Tests for uninstall_statusline()."""
+
+    def test_removes_script_file(self, tmp_path):
+        script_path = tmp_path / "statusline-command.sh"
+        settings_path = tmp_path / "settings.json"
+        script_path.write_text("#!/bin/bash\n")
+        settings_path.write_text(json.dumps({"statusLine": {"type": "command"}}))
+
+        uninstall_statusline(script_path=script_path, settings_path=settings_path)
+
+        assert not script_path.exists()
+
+    def test_removes_settings_entry(self, tmp_path):
+        script_path = tmp_path / "statusline-command.sh"
+        settings_path = tmp_path / "settings.json"
+        script_path.write_text("#!/bin/bash\n")
+        settings_path.write_text(json.dumps({
+            "statusLine": {"type": "command"},
+            "otherKey": 42,
+        }))
+
+        uninstall_statusline(script_path=script_path, settings_path=settings_path)
+
+        data = json.loads(settings_path.read_text())
+        assert "statusLine" not in data
+        assert data["otherKey"] == 42
+
+    def test_noop_if_script_missing(self, tmp_path):
+        script_path = tmp_path / "statusline-command.sh"
+        settings_path = tmp_path / "settings.json"
+
+        uninstall_statusline(script_path=script_path, settings_path=settings_path)
+
+        assert not script_path.exists()
 
 
 class TestUpdateClaudeCodeSettings:
@@ -81,6 +161,14 @@ class TestUpdateClaudeCodeSettings:
 
         data = json.loads(settings_path.read_text())
         assert str(script_path) in data["statusLine"]["command"]
+
+    def test_raises_on_corrupt_settings_file(self, tmp_path):
+        settings_path = tmp_path / "settings.json"
+        settings_path.write_text("{not valid json")
+        script_path = tmp_path / "statusline-command.sh"
+
+        with pytest.raises(CorruptSettingsError):
+            update_claude_code_settings(settings_path, script_path)
 
 
 class TestRemoveClaudeCodeSettings:

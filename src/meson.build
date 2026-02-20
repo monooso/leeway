@@ -15,6 +15,19 @@ sources = files(
 
 install_data(sources, install_dir: pkgdatadir)
 
+# Generate config.py with build-time values
+config_data = configuration_data()
+config_data.set('VERSION', meson.project_version())
+config_data.set('APP_ID', app_id)
+
+configure_file(
+  input: 'config.py.in',
+  output: 'config.py',
+  configuration: config_data,
+  install: true,
+  install_dir: pkgdatadir,
+)
+
 # Configure the launcher script with the correct python path and installed source dir
 launcher_conf = configuration_data()
 launcher_conf.set('PYTHON', python_path)

@@ -4,7 +4,8 @@ import json
 
 import pytest
 
-from api_client import API_URL, ApiError, USER_AGENT, build_request_headers, parse_response_body
+from api_client import API_URL, ApiError, build_request_headers, parse_response_body
+from config import APP_ID, VERSION
 from usage_model import UsageData
 
 
@@ -15,13 +16,13 @@ class TestBuildRequestHeaders:
         headers = build_request_headers("sk-ant-oat01-abc123")
         assert headers["Authorization"] == "Bearer sk-ant-oat01-abc123"
 
-    def test_includes_content_type(self):
+    def test_does_not_include_content_type(self):
         headers = build_request_headers("token")
-        assert headers["Content-Type"] == "application/json"
+        assert "Content-Type" not in headers
 
-    def test_includes_user_agent(self):
+    def test_includes_app_user_agent(self):
         headers = build_request_headers("token")
-        assert headers["User-Agent"] == USER_AGENT
+        assert headers["User-Agent"] == f"{APP_ID}/{VERSION}"
 
     def test_includes_anthropic_beta(self):
         headers = build_request_headers("token")

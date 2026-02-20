@@ -3,7 +3,11 @@
 import json
 from pathlib import Path
 
-from api_client import USER_AGENT
+from config import APP_ID
+
+
+class CorruptSettingsError(Exception):
+    """Raised when settings.json exists but contains invalid JSON."""
 
 STATUSLINE_SCRIPT_NAME = "statusline-command.sh"
 
@@ -77,7 +81,7 @@ except Exception:
         response=$(curl -s --max-time 5 \
             -H "Authorization: Bearer $token" \
             -H "Content-Type: application/json" \
-            -H "User-Agent: """ + USER_AGENT + r"""" \
+            -H "User-Agent: """ + APP_ID + r"""" \
             -H "anthropic-beta: oauth-2025-04-20" \
             "https://api.anthropic.com/api/oauth/usage" 2>/dev/null)
 
@@ -200,8 +204,10 @@ def update_claude_code_settings(
     if settings_path.exists():
         try:
             settings = json.loads(settings_path.read_text())
-        except (json.JSONDecodeError, ValueError):
-            settings = {}
+        except (json.JSONDecodeError, ValueError) as exc:
+            raise CorruptSettingsError(
+                f"Cannot update {settings_path}: file contains invalid JSON"
+            ) from exc
 
     settings["statusLine"] = {
         "type": "command",

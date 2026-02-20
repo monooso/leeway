@@ -2,11 +2,14 @@
 
 from enum import Enum, auto
 
+MODERATE_THRESHOLD = 50.0  # % — above this is moderate
+CRITICAL_THRESHOLD = 80.0  # % — above this is critical
+
 
 class StatusLevel(Enum):
-    SAFE = auto()      # ≤50 %
-    MODERATE = auto()  # 50–80 %
-    CRITICAL = auto()  # >80 %
+    SAFE = auto()      # <= MODERATE_THRESHOLD
+    MODERATE = auto()  # MODERATE_THRESHOLD < x <= CRITICAL_THRESHOLD
+    CRITICAL = auto()  # > CRITICAL_THRESHOLD
     UNKNOWN = auto()   # No data
 
 
@@ -14,15 +17,15 @@ def status_for_pct(pct: float | None) -> StatusLevel:
     """Map a utilisation percentage to a status level."""
     if pct is None:
         return StatusLevel.UNKNOWN
-    if pct <= 50.0:
+    if pct <= MODERATE_THRESHOLD:
         return StatusLevel.SAFE
-    if pct <= 80.0:
+    if pct <= CRITICAL_THRESHOLD:
         return StatusLevel.MODERATE
     return StatusLevel.CRITICAL
 
 
-# RGB tuples (0.0–1.0) for GTK colour properties.
-_STATUS_COLORS: dict[StatusLevel, tuple[float, float, float]] = {
+# RGB tuples (0.0-1.0) for GTK colour properties.
+STATUS_COLORS: dict[StatusLevel, tuple[float, float, float]] = {
     StatusLevel.SAFE: (0.18, 0.80, 0.44),       # green
     StatusLevel.MODERATE: (0.95, 0.77, 0.06),    # amber
     StatusLevel.CRITICAL: (0.90, 0.24, 0.24),    # red
@@ -32,7 +35,7 @@ _STATUS_COLORS: dict[StatusLevel, tuple[float, float, float]] = {
 
 def color_for_status(level: StatusLevel) -> tuple[float, float, float]:
     """Return an (R, G, B) tuple for the given status level."""
-    return _STATUS_COLORS[level]
+    return STATUS_COLORS[level]
 
 
 def color_for_pct(pct: float | None) -> tuple[float, float, float]:

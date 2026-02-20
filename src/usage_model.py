@@ -19,9 +19,16 @@ class UsageData:
 def _parse_iso_datetime(value: str | None) -> datetime | None:
     if not value:
         return None
-    # Handle both "Z" suffix and "+00:00"
-    text = value.replace("Z", "+00:00")
-    return datetime.fromisoformat(text)
+    try:
+        # Handle both "Z" suffix and "+00:00"
+        text = value.replace("Z", "+00:00")
+        result = datetime.fromisoformat(text)
+    except (ValueError, TypeError):
+        return None
+    # Reject naive datetimes (e.g. bare "2026-02-20" with no time/tz).
+    if result.tzinfo is None:
+        return None
+    return result
 
 
 def _get_pct(bucket: dict) -> float | None:

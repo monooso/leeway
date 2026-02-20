@@ -2,7 +2,33 @@
 
 from datetime import datetime, timezone
 
-from usage_model import UsageData, parse_usage_response
+import pytest
+
+from usage_model import UsageData, parse_usage_response, _parse_iso_datetime
+
+
+class TestParseIsoDatetime:
+    """Tests for _parse_iso_datetime()."""
+
+    def test_parses_z_suffix(self):
+        result = _parse_iso_datetime("2026-02-20T20:00:00Z")
+        assert result == datetime(2026, 2, 20, 20, 0, 0, tzinfo=timezone.utc)
+
+    def test_parses_offset_suffix(self):
+        result = _parse_iso_datetime("2026-02-20T20:00:00+00:00")
+        assert result == datetime(2026, 2, 20, 20, 0, 0, tzinfo=timezone.utc)
+
+    def test_returns_none_for_none(self):
+        assert _parse_iso_datetime(None) is None
+
+    def test_returns_none_for_empty_string(self):
+        assert _parse_iso_datetime("") is None
+
+    def test_returns_none_for_malformed_string(self):
+        assert _parse_iso_datetime("not-a-date") is None
+
+    def test_returns_none_for_partial_date(self):
+        assert _parse_iso_datetime("2026-02-20") is None
 
 
 class TestParseUsageResponse:
@@ -116,3 +142,23 @@ class TestParseUsageResponse:
         assert data.session_pct == 44.0
         assert data.weekly_pct == 15.0
         assert data.opus_pct is None
+
+    def test_survives_malformed_resets_at(self):
+        """A malformed date should not crash the entire parse."""
+        raw = {
+            "five_hour": {
+                "utilization_pct": 50.0,
+                "resets_at": "not-a-date",
+            },
+            "seven_day": {
+                "utilization_pct": 30.0,
+                "resets_at": "2026-02-23T00:00:00Z",
+            },
+        }
+
+        data = parse_usage_response(raw)
+
+        assert data.session_pct == 50.0
+        assert data.session_resets_at is None
+        assert data.weekly_pct == 30.0
+        assert data.weekly_resets_at == datetime(2026, 2, 23, 0, 0, 0, tzinfo=timezone.utc)

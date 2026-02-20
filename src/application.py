@@ -7,6 +7,7 @@ gi.require_version("Adw", "1")
 
 from gi.repository import Adw, Gio, Gtk
 
+from config import APP_ID, VERSION
 from window import ClaudeUsageWindow
 
 
@@ -15,7 +16,7 @@ class Application(Adw.Application):
 
     def __init__(self):
         super().__init__(
-            application_id="io.github.monooso.claude-usage-gnome",
+            application_id=APP_ID,
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
 
@@ -45,8 +46,8 @@ class Application(Adw.Application):
     def _on_about(self, _action, _param):
         about = Adw.AboutDialog(
             application_name="Claude Usage",
-            application_icon="io.github.monooso.claude-usage-gnome",
-            version="0.1.0",
+            application_icon=APP_ID,
+            version=VERSION,
             developer_name="Stephen Lewis",
             website="https://github.com/monooso/claude-usage-gnome",
             issue_url="https://github.com/monooso/claude-usage-gnome/issues",

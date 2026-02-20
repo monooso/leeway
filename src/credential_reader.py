@@ -58,7 +58,7 @@ def read_credentials(path: Path = DEFAULT_CREDENTIALS_PATH) -> Credentials:
     return Credentials(
         access_token=access_token,
         refresh_token=oauth.get("refreshToken"),
-        expires_at=oauth.get("expiresAt", 0),
+        expires_at=int(oauth.get("expiresAt", 0)),
         subscription_type=oauth.get("subscriptionType"),
         rate_limit_tier=oauth.get("rateLimitTier"),
     )

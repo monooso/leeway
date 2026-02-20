@@ -25,6 +25,10 @@
       <image>https://raw.githubusercontent.com/monooso/claude-usage-gnome/main/docs/claude-usage-screenshot.png</image>
     </screenshot>
   </screenshots>
+  <branding>
+    <color type="primary" scheme_preference="light">#c8a247</color>
+    <color type="primary" scheme_preference="dark">#1a1a2e</color>
+  </branding>
   <content_rating type="oars-1.1" />
   <releases>
     <release version="0.1.0" date="2026-02-20">

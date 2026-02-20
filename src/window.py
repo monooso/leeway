@@ -10,18 +10,18 @@ from datetime import datetime, timezone
 from gi.repository import Adw, Gio, GLib, Gtk
 
 from api_client import fetch_usage
+from config import APP_ID
 from credential_reader import CredentialError, read_credentials
 from usage_calculator import color_for_pct
 from usage_model import UsageData
 
-APP_ID = "io.github.monooso.claude-usage-gnome"
 
-
-def _format_reset_time(dt: datetime | None) -> str:
+def _format_reset_time(dt: datetime | None, *, now: datetime | None = None) -> str:
     """Format a reset datetime as a human-readable countdown or timestamp."""
     if dt is None:
-        return "—"
-    now = datetime.now(timezone.utc)
+        return "\u2014"
+    if now is None:
+        now = datetime.now(timezone.utc)
     delta = dt - now
     total_seconds = int(delta.total_seconds())
 
@@ -31,7 +31,7 @@ def _format_reset_time(dt: datetime | None) -> str:
     hours, remainder = divmod(total_seconds, 3600)
     minutes = remainder // 60
 
-    if hours > 24:
+    if hours >= 24:
         days = hours // 24
         return f"{days}d {hours % 24}h"
     if hours > 0:
@@ -41,42 +41,40 @@ def _format_reset_time(dt: datetime | None) -> str:
     return "< 1m"
 
 
-_bar_counter = 0
+def _truncate_error(message: str, *, max_length: int = 120) -> str:
+    """Truncate an error message to a sensible display length."""
+    if len(message) <= max_length:
+        return message
+    return message[: max_length - 3] + "..."
 
 
-def _assign_bar_css_class(bar: Gtk.LevelBar) -> str:
-    """Assign a unique CSS class to a LevelBar for scoped styling."""
-    global _bar_counter
-    cls = f"usage-bar-{_bar_counter}"
-    _bar_counter += 1
-    bar.add_css_class(cls)
-    bar._css_class = cls
-    return cls
-
-
-def _apply_color_to_bar(bar: Gtk.LevelBar, pct: float | None):
+def _apply_color_to_bar(
+    bar: Gtk.LevelBar,
+    pct: float | None,
+    bar_css: dict[Gtk.LevelBar, tuple[str, Gtk.CssProvider]],
+):
     """Apply a CSS colour to a LevelBar based on usage percentage."""
-    css_class = getattr(bar, "_css_class", None)
-    if css_class is None:
-        css_class = _assign_bar_css_class(bar)
-
-    # Remove previous provider if we stored one
-    old_provider = getattr(bar, "_css_provider", None)
-    if old_provider is not None:
+    if bar in bar_css:
+        css_class, old_provider = bar_css[bar]
         Gtk.StyleContext.remove_provider_for_display(
             bar.get_display(), old_provider
         )
+    else:
+        css_class = f"usage-bar-{len(bar_css)}"
+        bar.add_css_class(css_class)
 
     r, g, b = color_for_pct(pct)
-    css = f"""levelbar.{css_class} block.filled {{
-        background-color: rgba({int(r*255)}, {int(g*255)}, {int(b*255)}, 1.0);
-    }}"""
+    css = (
+        f"levelbar.{css_class} block.filled {{"
+        f" background-color: rgba({int(r*255)}, {int(g*255)}, {int(b*255)}, 1.0);"
+        f" }}"
+    )
     provider = Gtk.CssProvider()
     provider.load_from_string(css)
     Gtk.StyleContext.add_provider_for_display(
         bar.get_display(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
     )
-    bar._css_provider = provider
+    bar_css[bar] = (css_class, provider)
 
 
 class ClaudeUsageWindow(Adw.ApplicationWindow):
@@ -88,7 +86,10 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         self.set_default_size(420, -1)
 
         self._timer_id = None
+        self._debounce_id = None
         self._notification_tracker = set()
+        self._cancellable = Gio.Cancellable()
+        self._bar_css: dict[Gtk.LevelBar, tuple[str, Gtk.CssProvider]] = {}
 
         # Main layout
         toolbar_view = Adw.ToolbarView()
@@ -128,7 +129,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         session_group = Adw.PreferencesGroup(title="Session (5-hour)")
         self._session_reset_label = self._make_header_suffix(session_group)
         self._session_row, self._session_bar = self._make_metric_row(
-            "Usage", "—"
+            "Usage", "\u2014"
         )
         session_group.add(self._session_row)
         content_box.append(session_group)
@@ -137,7 +138,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         weekly_group = Adw.PreferencesGroup(title="Weekly (7-day)")
         self._weekly_reset_label = self._make_header_suffix(weekly_group)
         self._weekly_row, self._weekly_bar = self._make_metric_row(
-            "Usage", "—"
+            "Usage", "\u2014"
         )
         weekly_group.add(self._weekly_row)
         content_box.append(weekly_group)
@@ -145,7 +146,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         # Opus weekly usage group
         opus_group = Adw.PreferencesGroup(title="Opus (7-day)")
         self._opus_row, self._opus_bar = self._make_metric_row(
-            "Usage", "—"
+            "Usage", "\u2014"
         )
         opus_group.add(self._opus_row)
         opus_group.set_visible(False)
@@ -159,7 +160,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
             halign=Gtk.Align.CENTER,
             margin_top=12,
         )
-        self._status_label = Gtk.Label(label="Loading…")
+        self._status_label = Gtk.Label(label="Loading\u2026")
         self._status_label.add_css_class("dim-label")
         self._status_label.add_css_class("caption")
         footer_box.append(self._status_label)
@@ -180,6 +181,22 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
 
         # Auto-refresh timer
         self._start_timer()
+
+    def do_close_request(self):
+        """Clean up resources before the window is destroyed."""
+        if self._timer_id is not None:
+            GLib.source_remove(self._timer_id)
+            self._timer_id = None
+        if self._debounce_id is not None:
+            GLib.source_remove(self._debounce_id)
+            self._debounce_id = None
+        self._cancellable.cancel()
+        for _bar, (_, provider) in self._bar_css.items():
+            Gtk.StyleContext.remove_provider_for_display(
+                self.get_display(), provider
+            )
+        self._bar_css.clear()
+        return Adw.ApplicationWindow.do_close_request(self)
 
     def _make_metric_row(
         self, title: str, subtitle: str
@@ -225,8 +242,16 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         self._timer_id = GLib.timeout_add_seconds(interval, self._on_timer)
 
     def _on_interval_changed(self, _settings, _key):
-        """Restart the timer when the refresh interval changes."""
+        """Restart the timer when the refresh interval changes (debounced)."""
+        if self._debounce_id is not None:
+            GLib.source_remove(self._debounce_id)
+        self._debounce_id = GLib.timeout_add(300, self._apply_interval_change)
+
+    def _apply_interval_change(self) -> bool:
+        """Actually restart the timer after the debounce delay."""
+        self._debounce_id = None
         self._start_timer()
+        return GLib.SOURCE_REMOVE
 
     def _on_timer(self) -> bool:
         """Timer callback. Returns True to keep the timer running."""
@@ -238,7 +263,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
 
     def _refresh(self):
         """Read credentials and fetch usage data."""
-        self._status_label.set_text("Refreshing…")
+        self._status_label.set_text("Refreshing\u2026")
         self._updated_label.set_text("")
 
         try:
@@ -251,12 +276,20 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
             self._show_error("OAuth token has expired. Re-authenticate via Claude Code CLI.")
             return
 
-        fetch_usage(creds.access_token, self._on_usage_result)
+        # Cancel any in-flight request before starting a new one.
+        self._cancellable.cancel()
+        self._cancellable = Gio.Cancellable()
+
+        fetch_usage(creds.access_token, self._on_usage_result, self._cancellable)
 
     def _on_usage_result(self, data: UsageData | None, error: str | None):
         """Callback from fetch_usage — runs on the GLib main thread."""
         if error:
             self._show_error(error)
+            return
+
+        if data is None:
+            self._show_error("No data received")
             return
 
         self._update_ui(data)
@@ -268,21 +301,24 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         if data.session_pct is not None:
             self._session_row.set_subtitle(f"{data.session_pct:.1f} %")
             self._session_bar.set_value(min(data.session_pct, 100))
-            _apply_color_to_bar(self._session_bar, data.session_pct)
+            _apply_color_to_bar(self._session_bar, data.session_pct, self._bar_css)
         else:
-            self._session_row.set_subtitle("—")
+            self._session_row.set_subtitle("\u2014")
             self._session_bar.set_value(0)
 
         reset_text = _format_reset_time(data.session_resets_at)
-        self._session_reset_label.set_label(f"Resets in {reset_text}")
+        if data.session_resets_at is not None:
+            self._session_reset_label.set_label(f"Resets in {reset_text}")
+        else:
+            self._session_reset_label.set_label("")
 
         # Weekly
         if data.weekly_pct is not None:
             self._weekly_row.set_subtitle(f"{data.weekly_pct:.1f} %")
             self._weekly_bar.set_value(min(data.weekly_pct, 100))
-            _apply_color_to_bar(self._weekly_bar, data.weekly_pct)
+            _apply_color_to_bar(self._weekly_bar, data.weekly_pct, self._bar_css)
         else:
-            self._weekly_row.set_subtitle("—")
+            self._weekly_row.set_subtitle("\u2014")
             self._weekly_bar.set_value(0)
 
         if data.weekly_resets_at:
@@ -296,23 +332,28 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
         if data.opus_pct is not None:
             self._opus_row.set_subtitle(f"{data.opus_pct:.1f} %")
             self._opus_bar.set_value(min(data.opus_pct, 100))
-            _apply_color_to_bar(self._opus_bar, data.opus_pct)
+            _apply_color_to_bar(self._opus_bar, data.opus_pct, self._bar_css)
             self._opus_group.set_visible(True)
         else:
             self._opus_group.set_visible(False)
 
         # Footer
-        self._status_label.set_text("Connected ·")
         now = datetime.now(timezone.utc).astimezone().strftime("%H:%M:%S")
-        self._updated_label.set_text(f"Updated {now}")
+        self._status_label.set_text("Connected")
+        self._updated_label.set_text(f"\u00b7 Updated {now}")
 
     def _show_error(self, message: str):
         """Display an error message in the status label."""
-        self._status_label.set_text(f"Error: {message}")
+        self._status_label.set_text(f"Error: {_truncate_error(message)}")
         self._updated_label.set_text("")
 
     def _check_notifications(self, data: UsageData):
-        """Send desktop notifications at configured thresholds."""
+        """Send desktop notifications when session usage crosses thresholds.
+
+        Only session usage is tracked for notifications. Session limits reset
+        every 5 hours and are the most immediately actionable; weekly limits
+        are informational and shown in the dashboard but do not trigger alerts.
+        """
         if data.session_pct is None:
             return
 
@@ -345,6 +386,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
                 notification.set_body(body)
                 app.send_notification(f"threshold-{threshold}", notification)
 
-        # Reset tracker when usage drops (after a reset)
+        # Reset tracker when usage drops below 50% (i.e. after a session reset),
+        # so that notifications fire again for the new session.
         if data.session_pct < 50:
             self._notification_tracker.clear()

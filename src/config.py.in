@@ -1,0 +1,4 @@
+"""Build-time configuration — values substituted by Meson."""
+
+VERSION = '@VERSION@'
+APP_ID = '@APP_ID@'

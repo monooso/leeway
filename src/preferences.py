@@ -7,7 +7,13 @@ gi.require_version("Adw", "1")
 
 from gi.repository import Adw, Gio, Gtk
 
-from statusline import DEFAULT_SCRIPT_PATH, install_statusline, uninstall_statusline
+from config import APP_ID
+from statusline import (
+    CorruptSettingsError,
+    DEFAULT_SCRIPT_PATH,
+    install_statusline,
+    uninstall_statusline,
+)
 
 
 class PreferencesWindow(Adw.PreferencesWindow):
@@ -19,7 +25,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.set_default_size(400, 480)
         self.set_modal(True)
 
-        settings = Gio.Settings.new("io.github.monooso.claude-usage-gnome")
+        settings = Gio.Settings.new(APP_ID)
 
         # General page
         page = Adw.PreferencesPage(title="General", icon_name="preferences-system-symbolic")
@@ -66,13 +72,15 @@ class PreferencesWindow(Adw.PreferencesWindow):
         page.add(statusline_group)
 
         installed = DEFAULT_SCRIPT_PATH.exists()
-        statusline_row = Adw.SwitchRow(title="Enable statusline")
-        statusline_row.set_subtitle(
+        self._statusline_row = Adw.SwitchRow(title="Enable statusline")
+        self._statusline_row.set_subtitle(
             str(DEFAULT_SCRIPT_PATH) if installed else "Installs a bash script to ~/.claude/"
         )
-        statusline_row.set_active(installed)
-        statusline_row.connect("notify::active", self._on_statusline_toggled)
-        statusline_group.add(statusline_row)
+        self._statusline_row.set_active(installed)
+        self._statusline_handler_id = self._statusline_row.connect(
+            "notify::active", self._on_statusline_toggled
+        )
+        statusline_group.add(self._statusline_row)
 
     def _on_statusline_toggled(self, row, _param):
         try:
@@ -82,7 +90,10 @@ class PreferencesWindow(Adw.PreferencesWindow):
             else:
                 uninstall_statusline()
                 row.set_subtitle("Installs a bash script to ~/.claude/")
-        except OSError as exc:
+        except (OSError, CorruptSettingsError) as exc:
+            # Block the signal to avoid re-entrant calls while reverting.
+            row.handler_block(self._statusline_handler_id)
             row.set_active(not row.get_active())
+            row.handler_unblock(self._statusline_handler_id)
             toast = Adw.Toast(title=f"Statusline error: {exc}")
             self.add_toast(toast)

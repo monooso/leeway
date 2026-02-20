@@ -99,3 +99,16 @@ class TestReadCredentials:
         """read_credentials() without arguments uses ~/.claude/.credentials.json."""
         expected = Path.home() / ".claude" / ".credentials.json"
         assert DEFAULT_CREDENTIALS_PATH == expected
+
+    def test_handles_float_expires_at(self, tmp_path):
+        """expiresAt may arrive as a float from JSON; is_expired must still work."""
+        cred_file = tmp_path / ".credentials.json"
+        cred_file.write_text(json.dumps({
+            "claudeAiOauth": {
+                "accessToken": "sk-ant-oat01-test",
+                "expiresAt": time.time() * 1000 + 3_600_000.0,
+            }
+        }))
+
+        creds = read_credentials(cred_file)
+        assert creds.is_expired is False
