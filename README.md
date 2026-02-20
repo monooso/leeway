@@ -26,7 +26,39 @@ On Fedora, the runtime dependencies are installed by default. For development yo
 sudo dnf install python3-gobject gtk4 libadwaita libsoup3
 ```
 
-## Running
+## Installation
+
+### Flatpak (recommended)
+
+Install `flatpak-builder` if you don't already have it:
+
+```bash
+sudo dnf install flatpak-builder
+```
+
+Then build and install the app:
+
+```bash
+git clone https://github.com/monooso/claude-usage-gnome.git
+cd claude-usage-gnome
+flatpak-builder --user --install --force-clean _build com.github.monooso.claude-usage-gnome.yml
+```
+
+Launch from the GNOME app grid, or from the terminal:
+
+```bash
+flatpak run com.github.monooso.claude-usage-gnome
+```
+
+To uninstall:
+
+```bash
+flatpak uninstall --user com.github.monooso.claude-usage-gnome
+```
+
+### Run from source
+
+If you'd rather skip Flatpak, you can run directly from the source tree. This requires system Python with PyGObject, GTK4, Libadwaita, and libsoup3 (all installed by default on Fedora Workstation):
 
 ```bash
 git clone https://github.com/monooso/claude-usage-gnome.git
