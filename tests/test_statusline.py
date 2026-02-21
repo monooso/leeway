@@ -88,6 +88,17 @@ class TestInstallStatusline:
 
         assert script_path.exists()
 
+    def test_no_script_if_settings_fail(self, tmp_path):
+        """If settings update fails, the script should not be created."""
+        script_path = tmp_path / "statusline-command.sh"
+        settings_path = tmp_path / "settings.json"
+        settings_path.symlink_to("/nonexistent/target/settings.json")
+
+        with pytest.raises(BrokenSymlinkError):
+            install_statusline(script_path=script_path, settings_path=settings_path)
+
+        assert not script_path.exists()
+
 
 class TestUninstallStatusline:
     """Tests for uninstall_statusline()."""
@@ -120,6 +131,17 @@ class TestUninstallStatusline:
     def test_noop_if_script_missing(self, tmp_path):
         script_path = tmp_path / "statusline-command.sh"
         settings_path = tmp_path / "settings.json"
+
+        uninstall_statusline(script_path=script_path, settings_path=settings_path)
+
+        assert not script_path.exists()
+
+    def test_removes_script_with_broken_symlink_settings(self, tmp_path):
+        """Script is deleted even if settings.json is a broken symlink."""
+        script_path = tmp_path / "statusline-command.sh"
+        script_path.write_text("#!/bin/bash\n")
+        settings_path = tmp_path / "settings.json"
+        settings_path.symlink_to("/nonexistent/target/settings.json")
 
         uninstall_statusline(script_path=script_path, settings_path=settings_path)
 
@@ -210,9 +232,11 @@ class TestRemoveStatuslineSetting:
         remove_statusline_setting(settings_path)
         assert not settings_path.exists()
 
-    def test_raises_on_broken_symlink(self, tmp_path):
+    def test_noop_if_broken_symlink(self, tmp_path):
+        """A broken symlink is treated like a missing file."""
         settings_path = tmp_path / "settings.json"
         settings_path.symlink_to("/nonexistent/target/settings.json")
 
-        with pytest.raises(BrokenSymlinkError):
-            remove_statusline_setting(settings_path)
+        remove_statusline_setting(settings_path)
+
+        assert settings_path.is_symlink()  # symlink left intact

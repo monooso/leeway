@@ -183,10 +183,11 @@ def install_statusline(
     settings_path: Path = DEFAULT_SETTINGS_PATH,
 ) -> None:
     """Install the statusline script and update Claude Code settings."""
+    # Update settings first so a broken symlink fails before creating the script.
+    update_statusline_setting(settings_path, script_path)
     script_path.parent.mkdir(parents=True, exist_ok=True)
     script_path.write_text(generate_statusline_script())
     script_path.chmod(0o755)
-    update_statusline_setting(settings_path, script_path)
 
 
 def uninstall_statusline(
@@ -202,9 +203,8 @@ def uninstall_statusline(
 def _check_broken_symlink(settings_path: Path) -> None:
     """Raise if settings_path is a symlink whose target is inaccessible."""
     if settings_path.is_symlink() and not settings_path.exists():
-        target = settings_path.resolve()
         raise BrokenSymlinkError(
-            f"{settings_path} is a symlink to {target}, which is not accessible. "
+            f"{settings_path} is a symlink whose target is not accessible. "
             f"In a Flatpak sandbox, symlink targets outside ~/.claude/ cannot be followed."
         )
 
@@ -235,7 +235,6 @@ def update_statusline_setting(
 
 def remove_statusline_setting(settings_path: Path) -> None:
     """Remove the statusLine entry from Claude Code settings.json."""
-    _check_broken_symlink(settings_path)
     if not settings_path.exists():
         return
 
