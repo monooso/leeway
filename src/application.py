@@ -23,6 +23,13 @@ class Application(Adw.Application):
     def do_startup(self):
         Adw.Application.do_startup(self)
 
+        self.set_accels_for_action("window.close", ["<Control>w"])
+        self.set_accels_for_action("app.quit", ["<Control>q"])
+
+        quit_action = Gio.SimpleAction.new("quit", None)
+        quit_action.connect("activate", lambda *_: self.quit())
+        self.add_action(quit_action)
+
         prefs_action = Gio.SimpleAction.new("preferences", None)
         prefs_action.connect("activate", self._on_preferences)
         self.add_action(prefs_action)
