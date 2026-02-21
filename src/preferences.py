@@ -5,7 +5,7 @@ import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
-from gi.repository import Adw, Gio
+from gi.repository import Adw, Gio, Gtk
 
 from config import APP_ID
 from statusline import (
@@ -64,6 +64,14 @@ class PreferencesDialog(Adw.PreferencesDialog):
             )
             notify_group.add(row)
 
+        test_row = Adw.ActionRow(title="Test notification")
+        test_row.set_subtitle("Send a test notification to verify delivery")
+        test_button = Gtk.Button(label="Send", valign=Gtk.Align.CENTER)
+        test_button.add_css_class("suggested-action")
+        test_button.connect("clicked", self._on_test_notification)
+        test_row.add_suffix(test_button)
+        notify_group.add(test_row)
+
         # Statusline group
         statusline_group = Adw.PreferencesGroup(
             title="Claude Code Statusline",
@@ -81,6 +89,17 @@ class PreferencesDialog(Adw.PreferencesDialog):
             "notify::active", self._on_statusline_toggled
         )
         statusline_group.add(self._statusline_row)
+
+    def _on_test_notification(self, _button):
+        app = Gio.Application.get_default()
+        if not app:
+            self.add_toast(Adw.Toast(title="No running application instance"))
+            return
+
+        notification = Gio.Notification.new("Claude Usage: Test")
+        notification.set_body("Notifications are working.")
+        app.send_notification("test-notification", notification)
+        self.add_toast(Adw.Toast(title="Test notification sent"))
 
     def _on_statusline_toggled(self, row, _param):
         try:
