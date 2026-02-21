@@ -62,6 +62,16 @@ To uninstall:
 flatpak uninstall --user io.github.monooso.claude-usage-gnome
 ```
 
+#### Symlinked dotfiles
+
+The Flatpak sandbox can only access `~/.claude/`. If you symlink files such as `~/.claude/settings.json` to a dotfiles repo elsewhere on disk, the statusline feature won't be able to follow the symlink. Grant access to the target directory with a Flatpak override:
+
+```bash
+flatpak override --user --filesystem=~/path/to/dotfiles/.claude io.github.monooso.claude-usage-gnome
+```
+
+Or use [Flatseal](https://flathub.org/apps/com.github.tchx84.Flatseal) to add the path in the Filesystem section.
+
 ### Run from source
 
 If you'd rather skip Flatpak, you can run directly from the source tree. This requires system Python with PyGObject, GTK4, Libadwaita, and libsoup3 (all installed by default on Fedora Workstation):
