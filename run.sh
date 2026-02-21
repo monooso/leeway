@@ -1,10 +1,10 @@
 #!/bin/bash
-# Run Claude Usage directly without Meson build
+# Run Headroom directly without Meson build
 # Requires: system Python 3 with PyGObject, GTK4, Libadwaita
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 export GSETTINGS_SCHEMA_DIR="$SCRIPT_DIR/data"
 
-APP_ID="io.github.monooso.claude-usage-gnome"
+APP_ID="io.github.monooso.headroom"
 VERSION=$(sed -n "s/.*version: *'\([^']*\)'.*/\1/p" "$SCRIPT_DIR/meson.build" | head -1)
 
 # Compile the GSettings schema if needed

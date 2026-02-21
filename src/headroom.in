@@ -1,4 +1,4 @@
 #!/bin/bash
-# Launcher for Claude Usage GNOME app
+# Launcher for Headroom
 export PYTHONPATH="@PKGDATADIR@"
 exec @PYTHON@ @PKGDATADIR@/main.py "$@"

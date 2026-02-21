@@ -1,8 +1,8 @@
-app-id: io.github.monooso.claude-usage-gnome
+app-id: io.github.monooso.headroom
 runtime: org.gnome.Platform
 runtime-version: '49'
 sdk: org.gnome.Sdk
-command: claude-usage-gnome
+command: headroom
 
 finish-args:
   - --share=network
@@ -12,7 +12,7 @@ finish-args:
   - --filesystem=~/.claude
 
 modules:
-  - name: claude-usage-gnome
+  - name: headroom
     buildsystem: meson
     config-opts:
       - -Dpython_path=/usr/bin/python3

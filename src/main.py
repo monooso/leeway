@@ -1,4 +1,4 @@
-"""Entry point for Claude Usage GNOME application."""
+"""Entry point for Headroom application."""
 
 import sys
 

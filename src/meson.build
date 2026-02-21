@@ -1,5 +1,5 @@
 python_path = get_option('python_path')
-pkgdatadir = get_option('prefix') / get_option('datadir') / 'claude-usage-gnome'
+pkgdatadir = get_option('prefix') / get_option('datadir') / 'headroom'
 
 sources = files(
   'main.py',
@@ -34,8 +34,8 @@ launcher_conf.set('PYTHON', python_path)
 launcher_conf.set('PKGDATADIR', pkgdatadir)
 
 configure_file(
-  input: 'claude-usage-gnome.in',
-  output: 'claude-usage-gnome',
+  input: 'headroom.in',
+  output: 'headroom',
   configuration: launcher_conf,
   install: true,
   install_dir: get_option('bindir'),

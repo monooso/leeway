@@ -96,7 +96,7 @@ class PreferencesDialog(Adw.PreferencesDialog):
             self.add_toast(Adw.Toast(title="No running application instance"))
             return
 
-        notification = Gio.Notification.new("Claude Usage: Test")
+        notification = Gio.Notification.new("Headroom: Test")
         notification.set_body("Notifications are working.")
         app.send_notification("test-notification", notification)
         self.add_toast(Adw.Toast(title="Test notification sent"))

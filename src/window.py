@@ -1,4 +1,4 @@
-"""Main window for Claude Usage."""
+"""Main window for Headroom."""
 
 import gi
 
@@ -82,7 +82,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.set_title("Claude Usage")
+        self.set_title("Headroom")
         self.set_default_size(420, -1)
 
         self._timer_id = None
@@ -370,7 +370,7 @@ class ClaudeUsageWindow(Adw.ApplicationWindow):
                 else:
                     body = f"Session usage has reached {threshold} %. Resets in {reset_text}."
 
-                notification = Gio.Notification.new(f"Claude Usage: {data.session_pct:.0f} %")
+                notification = Gio.Notification.new(f"Headroom: {data.session_pct:.0f} %")
                 notification.set_body(body)
                 app.send_notification(f"threshold-{threshold}", notification)
 

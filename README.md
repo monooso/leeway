@@ -1,6 +1,6 @@
-# Claude Usage
+# Headroom
 
-![Claude Usage application screenshot](docs/claude-usage-screenshot.png)
+![Headroom application screenshot](docs/claude-usage-screenshot.png)
 
 A native GNOME desktop application for monitoring Claude Code usage and rate limits. Displays session, weekly, and Opus utilisation with colour-coded progress bars, countdown timers, and desktop notifications.
 
@@ -45,21 +45,21 @@ sudo dnf install flatpak-builder
 Then build and install the app:
 
 ```bash
-git clone https://github.com/monooso/claude-usage-gnome.git
-cd claude-usage-gnome
-flatpak-builder --user --install --force-clean _build io.github.monooso.claude-usage-gnome.yml
+git clone https://github.com/monooso/headroom.git
+cd headroom
+flatpak-builder --user --install --force-clean _build io.github.monooso.headroom.yml
 ```
 
 Launch from the GNOME app grid, or from the terminal:
 
 ```bash
-flatpak run io.github.monooso.claude-usage-gnome
+flatpak run io.github.monooso.headroom
 ```
 
 To uninstall:
 
 ```bash
-flatpak uninstall --user io.github.monooso.claude-usage-gnome
+flatpak uninstall --user io.github.monooso.headroom
 ```
 
 #### Symlinked dotfiles
@@ -67,7 +67,7 @@ flatpak uninstall --user io.github.monooso.claude-usage-gnome
 The Flatpak sandbox can only access `~/.claude/`. If you symlink files such as `~/.claude/settings.json` to a dotfiles repo elsewhere on disk, the statusline feature won't be able to follow the symlink. Grant access to the target directory with a Flatpak override:
 
 ```bash
-flatpak override --user --filesystem=~/path/to/dotfiles/.claude io.github.monooso.claude-usage-gnome
+flatpak override --user --filesystem=~/path/to/dotfiles/.claude io.github.monooso.headroom
 ```
 
 Or use [Flatseal](https://flathub.org/apps/com.github.tchx84.Flatseal) to add the path in the Filesystem section.
@@ -77,8 +77,8 @@ Or use [Flatseal](https://flathub.org/apps/com.github.tchx84.Flatseal) to add th
 If you'd rather skip Flatpak, you can run directly from the source tree. This requires system Python with PyGObject, GTK4, Libadwaita, and libsoup3 (all installed by default on Fedora Workstation):
 
 ```bash
-git clone https://github.com/monooso/claude-usage-gnome.git
-cd claude-usage-gnome
+git clone https://github.com/monooso/headroom.git
+cd headroom
 ./run.sh
 ```
 

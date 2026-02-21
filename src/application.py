@@ -1,4 +1,4 @@
-"""Adw.Application subclass for Claude Usage."""
+"""Adw.Application subclass for Headroom."""
 
 import gi
 
@@ -52,12 +52,12 @@ class Application(Adw.Application):
 
     def _on_about(self, _action, _param):
         about = Adw.AboutDialog(
-            application_name="Claude Usage",
+            application_name="Headroom",
             application_icon=APP_ID,
             version=VERSION,
             developer_name="Stephen Lewis",
-            website="https://github.com/monooso/claude-usage-gnome",
-            issue_url="https://github.com/monooso/claude-usage-gnome/issues",
+            website="https://github.com/monooso/headroom",
+            issue_url="https://github.com/monooso/headroom/issues",
             license_type=Gtk.License.AGPL_3_0,
         )
         about.present(self.props.active_window)

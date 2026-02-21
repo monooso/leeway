@@ -3,7 +3,7 @@
   <id>@APP_ID@</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>AGPL-3.0-or-later</project_license>
-  <name>Claude Usage</name>
+  <name>Headroom</name>
   <summary>Track Claude Code usage and rate limits</summary>
   <description>
     <p>
@@ -24,13 +24,13 @@
   <developer id="io.github.monooso">
     <name>Stephen Lewis</name>
   </developer>
-  <url type="homepage">https://github.com/monooso/claude-usage-gnome</url>
-  <url type="bugtracker">https://github.com/monooso/claude-usage-gnome/issues</url>
-  <url type="vcs-browser">https://github.com/monooso/claude-usage-gnome</url>
+  <url type="homepage">https://github.com/monooso/headroom</url>
+  <url type="bugtracker">https://github.com/monooso/headroom/issues</url>
+  <url type="vcs-browser">https://github.com/monooso/headroom</url>
   <screenshots>
     <screenshot type="default">
       <caption>Dashboard showing session and weekly usage</caption>
-      <image>https://raw.githubusercontent.com/monooso/claude-usage-gnome/main/docs/claude-usage-screenshot.png</image>
+      <image>https://raw.githubusercontent.com/monooso/headroom/main/docs/claude-usage-screenshot.png</image>
     </screenshot>
   </screenshots>
   <branding>

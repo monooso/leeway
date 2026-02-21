@@ -1,7 +1,7 @@
 [Desktop Entry]
-Name=Claude Usage
+Name=Headroom
 Comment=Track Claude Code usage and rate limits
-Exec=@BINDIR@/claude-usage-gnome
+Exec=@BINDIR@/headroom
 Icon=@APP_ID@
 Terminal=false
 Type=Application

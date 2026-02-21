@@ -5,4 +5,4 @@ config.py.in. Keep VERSION and APP_ID in sync with meson.build.
 """
 
 VERSION = '0.1.0'
-APP_ID = 'io.github.monooso.claude-usage-gnome'
+APP_ID = 'io.github.monooso.headroom'
