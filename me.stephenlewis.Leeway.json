@@ -30,9 +30,8 @@
             "buildsystem" : "meson",
             "sources" : [
                 {
-                    "type" : "git",
-                    "url" : "file:///home/sl/code/leeway",
-                    "branch" : "main"
+                    "type" : "dir",
+                    "path" : "."
                 }
             ],
             "config-opts" : [
