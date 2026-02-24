@@ -19,12 +19,7 @@
 
 """Tests for usage_calculator colour mappings."""
 
-import sys
-import os
 from math import isclose
-
-# Allow importing from src/app/ without installing.
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), os.pardir, "src", "app"))
 
 from usage_calculator import STATUS_COLORS, StatusLevel
 
