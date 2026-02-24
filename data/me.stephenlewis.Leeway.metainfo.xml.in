@@ -43,12 +43,15 @@
 
   <releases>
     <release version="1.0.0" date="2026-02-24">
-      <url type="details">https://github.com/monooso/leeway</url>
+      <url type="details">https://github.com/monooso/leeway/releases</url>
       <description translate="no">
         <p>Initial release</p>
         <ul>
-          <li>List of changes</li>
-          <li>List of changes</li>
+          <li>Dashboard showing session (5-hour), weekly (7-day), and Opus usage</li>
+          <li>Colour-coded progress bars using the GNOME HIG palette</li>
+          <li>Configurable auto-refresh interval (15–300 seconds)</li>
+          <li>Desktop notifications at 75%, 90%, and 95% session usage</li>
+          <li>Keyboard shortcuts for refresh, preferences, and shortcuts dialog</li>
         </ul>
       </description>
     </release>

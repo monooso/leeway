@@ -18,4 +18,4 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 APP_ID = 'me.stephenlewis.Leeway'
-VERSION = '0.1.0'
+VERSION = '1.0.0'

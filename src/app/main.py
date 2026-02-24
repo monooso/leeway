@@ -60,7 +60,7 @@ class LeewayApplication(Adw.Application):
                                 developers=['Stephen Lewis'],
                                 issue_url='https://github.com/monooso/leeway/issues',
                                 license_type=Gtk.License.AGPL_3_0,
-                                version='0.1.0',
+                                version='1.0.0',
                                 website='https://github.com/monooso/leeway')
         about.present(self.props.active_window)
 
