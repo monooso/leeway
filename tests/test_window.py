@@ -1,5 +1,9 @@
 """Tests for window module — pure functions only."""
 
+import pytest
+
+pytest.importorskip("gi", reason="gi (PyGObject) not available outside Flatpak sandbox")
+
 from datetime import datetime, timedelta, timezone
 
 from window import _format_reset_time, _truncate_error

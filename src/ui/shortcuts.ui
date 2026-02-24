@@ -20,7 +20,7 @@
         </child>
         <child>
           <object class="AdwShortcutsItem">
-            <property name="title" translatable="yes">Keybboard shortcuts</property>
+            <property name="title" translatable="yes">Keyboard shortcuts</property>
             <property name="action-name">app.shortcuts</property>
           </object>
         </child>

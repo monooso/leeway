@@ -1,8 +1,11 @@
 # List of source files containing translatable strings.
 # Please keep this file sorted alphabetically.
 data/me.stephenlewis.Leeway.desktop.in
-data/me.stephenlewis.Leeway.metainfo.xml.in
 data/me.stephenlewis.Leeway.gschema.xml
+data/me.stephenlewis.Leeway.metainfo.xml.in
 src/app/main.py
 src/app/window.py
+src/ui/preferences.ui
+src/ui/shortcuts.ui
+src/ui/usage-group.ui
 src/ui/window.ui

@@ -24,6 +24,7 @@ gi.require_version('Adw', '1')
 gi.require_version('Gtk', '4.0')
 
 from gi.repository import Adw, Gio, Gtk
+from .config import VERSION
 from .preferences import LeewayPreferencesDialog  # noqa: F401 — registers the GType
 from .window import LeewayWindow
 
@@ -60,7 +61,7 @@ class LeewayApplication(Adw.Application):
                                 developers=['Stephen Lewis'],
                                 issue_url='https://github.com/monooso/leeway/issues',
                                 license_type=Gtk.License.AGPL_3_0,
-                                version='1.0.0',
+                                version=VERSION,
                                 website='https://github.com/monooso/leeway')
         about.present(self.props.active_window)
 

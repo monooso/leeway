@@ -258,6 +258,13 @@ class LeewayWindow(Adw.ApplicationWindow):
             self.opus_group.row.set_subtitle(f"{data.opus_pct:.1f} %")
             self.opus_group.bar.set_value(min(data.opus_pct, 100))
             _apply_color_to_bar(self.opus_group.bar, data.opus_pct, self._bar_css)
+
+            opus_reset_text = _format_reset_time(data.opus_resets_at)
+            if data.opus_resets_at is not None:
+                self.opus_group.reset_label.set_label(f"Resets in {opus_reset_text}")
+            else:
+                self.opus_group.reset_label.set_label("")
+
             self.opus_group.set_visible(True)
         else:
             self.opus_group.set_visible(False)

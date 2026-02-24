@@ -4,6 +4,8 @@ import json
 
 import pytest
 
+pytest.importorskip("gi", reason="gi (PyGObject) not available outside Flatpak sandbox")
+
 from api_client import API_URL, ApiError, build_request_headers, parse_response_body
 from config import APP_ID, VERSION
 from usage_model import UsageData
