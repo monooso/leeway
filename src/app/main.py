@@ -38,7 +38,6 @@ class LeewayApplication(Adw.Application):
         self.create_action('about', self.on_about_action)
         self.create_action('preferences', self.on_preferences_action, ['<control>comma'])
         self.create_action('refresh', self.on_refresh_action, ['<control>r'])
-        self.create_action('shortcuts', self.on_shortcuts_action, ['<control>question'])
         self.set_accels_for_action('window.close', ['<control>w'])
 
     def do_activate(self):
@@ -75,10 +74,6 @@ class LeewayApplication(Adw.Application):
         win = self.props.active_window
         if win:
             win.refresh()
-
-    def on_shortcuts_action(self, widget, _):
-        """Callback for the app.shortcuts action."""
-        pass
 
     def create_action(self, name, callback, shortcuts=None):
         """Add an application action.
