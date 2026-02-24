@@ -28,17 +28,17 @@ configure_file(
 )
 
 leeway_sources = [
-  '__init__.py',
-  'api_client.py',
-  'config.py',
-  'credential_reader.py',
-  'main.py',
-  'preferences.py',
-  'statusline.py',
-  'usage_calculator.py',
-  'usage_group.py',
-  'usage_model.py',
-  'window.py',
+  'app/__init__.py',
+  'app/api_client.py',
+  'app/config.py',
+  'app/credential_reader.py',
+  'app/main.py',
+  'app/preferences.py',
+  'app/statusline.py',
+  'app/usage_calculator.py',
+  'app/usage_group.py',
+  'app/usage_model.py',
+  'app/window.py',
 ]
 
 install_data(leeway_sources, install_dir: moduledir)

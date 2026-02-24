@@ -3,6 +3,6 @@
 data/me.stephenlewis.Leeway.desktop.in
 data/me.stephenlewis.Leeway.metainfo.xml.in
 data/me.stephenlewis.Leeway.gschema.xml
-src/main.py
-src/window.py
+src/app/main.py
+src/app/window.py
 src/ui/window.ui
