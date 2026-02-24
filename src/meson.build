@@ -4,6 +4,7 @@ gnome = import('gnome')
 
 gnome.compile_resources('leeway',
   'ui/leeway.gresource.xml',
+  source_dir: 'ui',
   gresource_bundle: true,
   install: true,
   install_dir: pkgdatadir,
