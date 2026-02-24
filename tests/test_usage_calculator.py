@@ -21,7 +21,7 @@
 
 from math import isclose
 
-from usage_calculator import STATUS_COLORS, StatusLevel
+from app.usage_calculator import STATUS_COLORS, StatusLevel
 
 
 def _hex_to_floats(hex_color: str) -> tuple[float, float, float]:

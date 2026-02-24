@@ -27,7 +27,7 @@ from .usage_group import LeewayUsageGroup  # noqa: F401 — registers the GType
 from .api_fetcher import fetch_usage
 from .config import APP_ID
 from .credential_reader import CredentialError, read_credentials
-from .formatting import _format_reset_time, _truncate_error
+from .formatting import format_reset_time, truncate_error
 from .usage_calculator import color_for_pct
 from .usage_model import UsageData
 
@@ -201,7 +201,7 @@ class LeewayWindow(Adw.ApplicationWindow):
             self.session_group.row.set_subtitle("\u2014")
             self.session_group.bar.set_value(0)
 
-        reset_text = _format_reset_time(data.session_resets_at)
+        reset_text = format_reset_time(data.session_resets_at)
         if data.session_resets_at is not None:
             self.session_group.reset_label.set_label(f"Resets in {reset_text}")
         else:
@@ -216,7 +216,7 @@ class LeewayWindow(Adw.ApplicationWindow):
             self.weekly_group.row.set_subtitle("\u2014")
             self.weekly_group.bar.set_value(0)
 
-        weekly_reset_text = _format_reset_time(data.weekly_resets_at)
+        weekly_reset_text = format_reset_time(data.weekly_resets_at)
         if data.weekly_resets_at is not None:
             self.weekly_group.reset_label.set_label(f"Resets in {weekly_reset_text}")
         else:
@@ -228,7 +228,7 @@ class LeewayWindow(Adw.ApplicationWindow):
             self.opus_group.bar.set_value(min(data.opus_pct, 100))
             _apply_color_to_bar(self.opus_group.bar, data.opus_pct, self._bar_css)
 
-            opus_reset_text = _format_reset_time(data.opus_resets_at)
+            opus_reset_text = format_reset_time(data.opus_resets_at)
             if data.opus_resets_at is not None:
                 self.opus_group.reset_label.set_label(f"Resets in {opus_reset_text}")
             else:
@@ -244,7 +244,7 @@ class LeewayWindow(Adw.ApplicationWindow):
 
     def _show_error(self, message: str):
         """Display an error message in the status label."""
-        self.status_label.set_text(f"Error: {_truncate_error(message)}")
+        self.status_label.set_text(f"Error: {truncate_error(message)}")
 
     def _check_notifications(self, data: UsageData):
         """Send desktop notifications when session usage crosses thresholds.
@@ -275,7 +275,7 @@ class LeewayWindow(Adw.ApplicationWindow):
             if data.session_pct >= threshold and threshold not in self._notification_tracker:
                 self._notification_tracker.add(threshold)
 
-                reset_text = _format_reset_time(data.session_resets_at)
+                reset_text = format_reset_time(data.session_resets_at)
                 if reset_text == "now":
                     body = f"Session usage has reached {threshold} %. Resets now."
                 else:

@@ -4,9 +4,9 @@ import json
 
 import pytest
 
-from api_client import API_URL, ApiError, build_request_headers, parse_response_body
-from config import APP_ID, VERSION
-from usage_model import UsageData
+from app.api_client import API_URL, ApiError, build_request_headers, parse_response_body
+from app.config import APP_ID, VERSION
+from app.usage_model import UsageData
 
 
 class TestBuildRequestHeaders:

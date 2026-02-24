@@ -22,7 +22,7 @@
 from datetime import datetime, timezone
 
 
-def _format_reset_time(dt: datetime | None, *, now: datetime | None = None) -> str:
+def format_reset_time(dt: datetime | None, *, now: datetime | None = None) -> str:
     """Format a reset datetime as a human-readable countdown or timestamp."""
     if dt is None:
         return "\u2014"
@@ -47,7 +47,7 @@ def _format_reset_time(dt: datetime | None, *, now: datetime | None = None) -> s
     return "< 1m"
 
 
-def _truncate_error(message: str, *, max_length: int = 120) -> str:
+def truncate_error(message: str, *, max_length: int = 120) -> str:
     """Truncate an error message to a sensible display length."""
     if len(message) <= max_length:
         return message

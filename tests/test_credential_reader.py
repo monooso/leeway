@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from credential_reader import Credentials, read_credentials, CredentialError, DEFAULT_CREDENTIALS_PATH
+from app.credential_reader import Credentials, read_credentials, CredentialError, DEFAULT_CREDENTIALS_PATH
 
 
 class TestReadCredentials:

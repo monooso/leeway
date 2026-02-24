@@ -21,12 +21,8 @@
 
 import json
 
-try:
-    from .config import APP_ID, VERSION
-    from .usage_model import UsageData, parse_usage_response
-except ImportError:
-    from config import APP_ID, VERSION
-    from usage_model import UsageData, parse_usage_response
+from .config import APP_ID, VERSION
+from .usage_model import UsageData, parse_usage_response
 
 API_URL = "https://api.anthropic.com/api/oauth/usage"
 USER_AGENT = f"{APP_ID}/{VERSION}"

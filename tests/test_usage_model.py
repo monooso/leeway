@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from usage_model import UsageData, parse_usage_response, _parse_iso_datetime
+from app.usage_model import UsageData, parse_usage_response, _parse_iso_datetime
 
 
 class TestParseIsoDatetime:
