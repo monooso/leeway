@@ -13,28 +13,27 @@ A native GNOME desktop application for monitoring Claude Code usage and rate lim
 ## Features
 
 - **Dashboard** — session (5-hour), weekly (7-day), and Opus usage at a glance
-- **Colour-coded bars** — green / amber / red based on utilisation thresholds
+- **Colour-coded bars** — green / yellow / red based on GNOME HIG palette
 - **Auto-refresh** — configurable interval (15–300 seconds, default 60)
 - **Desktop notifications** — alerts at 75%, 90%, and 95% session usage
 - **Claude Code statusline** — optional bash script for terminal integration
-- **Native GNOME** — GTK4 + Libadwaita, GSettings, `Gio.Notification`
+- **Keyboard shortcuts** — Ctrl+R refresh, Ctrl+, preferences, Ctrl+? shortcuts
+- **Native GNOME** — GTK4 + Libadwaita 1.8, GSettings, `Gio.Notification`
 
 ## Requirements
 
-- Fedora Workstation (or any distro with GNOME 44+)
-- Python 3.12+ with PyGObject (system package)
-- GTK4 ≥ 4.10, Libadwaita ≥ 1.4, libsoup3 ≥ 3.0
+- GNOME 49+ (org.gnome.Platform 49)
+- Python 3.12+ with PyGObject
+- GTK4, Libadwaita ≥ 1.8, libsoup3
 - Claude Code CLI (for OAuth credentials)
-
-On Fedora, the runtime dependencies are installed by default. For development you also need:
-
-```bash
-sudo dnf install python3-gobject gtk4 libadwaita libsoup3
-```
 
 ## Installation
 
-### Flatpak (recommended)
+### GNOME Builder (recommended for development)
+
+Open the project in [GNOME Builder](https://apps.gnome.org/Builder/) and click the play button. Builder will handle the Flatpak SDK, dependencies, and build automatically.
+
+### Flatpak (command line)
 
 Install `flatpak-builder` if you don't already have it:
 
@@ -45,75 +44,72 @@ sudo dnf install flatpak-builder
 Then build and install the app:
 
 ```bash
-git clone https://github.com/monooso/headroom.git
-cd headroom
-flatpak-builder --user --install --force-clean _build io.github.monooso.headroom.yml
+git clone https://github.com/monooso/leeway.git
+cd leeway
+flatpak-builder --user --install --force-clean _build me.stephenlewis.Leeway.json
 ```
 
 Launch from the GNOME app grid, or from the terminal:
 
 ```bash
-flatpak run io.github.monooso.headroom
+flatpak run me.stephenlewis.Leeway
 ```
 
 To uninstall:
 
 ```bash
-flatpak uninstall --user io.github.monooso.headroom
+flatpak uninstall --user me.stephenlewis.Leeway
 ```
-
-#### Symlinked dotfiles
-
-The Flatpak sandbox can only access `~/.claude/`. If you symlink files such as `~/.claude/settings.json` to a dotfiles repo elsewhere on disk, the statusline feature won't be able to follow the symlink. Grant access to the target directory with a Flatpak override:
-
-```bash
-flatpak override --user --filesystem=~/path/to/dotfiles/.claude io.github.monooso.headroom
-```
-
-Or use [Flatseal](https://flathub.org/apps/com.github.tchx84.Flatseal) to add the path in the Filesystem section.
-
-### Run from source
-
-If you'd rather skip Flatpak, you can run directly from the source tree. This requires system Python with PyGObject, GTK4, Libadwaita, and libsoup3 (all installed by default on Fedora Workstation):
-
-```bash
-git clone https://github.com/monooso/headroom.git
-cd headroom
-./run.sh
-```
-
-The `run.sh` script uses the system Python (`/usr/bin/python3`) with PyGObject. It compiles the GSettings schema automatically on first run.
 
 ## Development
 
-### Setup
-
-Create a virtual environment that inherits system site-packages (for PyGObject) and install test dependencies:
-
-```bash
-/usr/bin/python3 -m venv --system-site-packages .venv
-.venv/bin/pip install pytest
-```
-
 ### Running tests
 
+Tests run outside the Flatpak sandbox using the system Python. Some test files require PyGObject (`gi`) and will be skipped if it's not available.
+
 ```bash
-.venv/bin/python3 -m pytest tests/ -v
+python3 -m pytest tests/ -v
 ```
 
 ### Project structure
 
 ```
 src/
-├── main.py               # Entry point
-├── application.py        # Adw.Application subclass
-├── window.py             # Main dashboard window
-├── credential_reader.py  # Reads ~/.claude/.credentials.json
-├── api_client.py         # Async HTTP via libsoup3
-├── usage_model.py        # UsageData dataclass + parser
-├── usage_calculator.py   # Threshold/colour logic
-├── preferences.py        # Preferences window (GSettings)
-└── statusline.py         # Claude Code statusline integration
+  meson.build              # Build configuration
+  leeway.in                # Entry point (configured by Meson)
+  app/
+    __init__.py
+    main.py                # Adw.Application subclass
+    window.py              # Main dashboard window
+    config.py              # App ID, version constants
+    credential_reader.py   # Reads ~/.claude/.credentials.json
+    api_client.py          # Async HTTP via libsoup3
+    usage_model.py         # UsageData dataclass + parser
+    usage_calculator.py    # Threshold/colour logic
+    usage_group.py         # Usage group composite widget
+    preferences.py         # Preferences dialog (GSettings)
+    statusline.py          # Claude Code statusline integration
+  ui/
+    window.ui              # Main window template
+    usage-group.ui         # Usage group template
+    preferences.ui         # Preferences dialog template
+    shortcuts.ui           # Keyboard shortcuts dialog
+    leeway.gresource.xml   # GResource manifest
+data/
+  me.stephenlewis.Leeway.desktop.in
+  me.stephenlewis.Leeway.gschema.xml
+  me.stephenlewis.Leeway.metainfo.xml.in
+  me.stephenlewis.Leeway.service.in
+  icons/
+    ...
+tests/
+  conftest.py              # Shared test configuration
+  test_api_client.py
+  test_credential_reader.py
+  test_statusline.py
+  test_usage_calculator.py
+  test_usage_model.py
+  test_window.py
 ```
 
 ### Contributing
@@ -122,7 +118,7 @@ src/
 2. Create a feature branch
 3. Write tests first (TDD — tests must fail before implementation)
 4. Implement the minimum to make tests pass
-5. Run the full test suite: `.venv/bin/python3 -m pytest tests/ -v`
+5. Run the full test suite: `python3 -m pytest tests/ -v`
 6. Submit a pull request
 
 ## Acknowledgements
