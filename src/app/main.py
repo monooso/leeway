@@ -80,7 +80,8 @@ class LeewayApplication(Adw.Application):
         """Callback for the app.shortcuts action."""
         builder = Gtk.Builder.new_from_resource('/me/stephenlewis/Leeway/shortcuts-dialog.ui')
         dialog = builder.get_object('shortcuts_dialog')
-        dialog.present(self.props.active_window)
+        dialog.set_transient_for(self.props.active_window)
+        dialog.present()
 
     def create_action(self, name, callback, shortcuts=None):
         """Add an application action.
