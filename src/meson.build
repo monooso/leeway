@@ -34,7 +34,6 @@ leeway_sources = [
   'app/credential_reader.py',
   'app/main.py',
   'app/preferences.py',
-  'app/statusline.py',
   'app/usage_calculator.py',
   'app/usage_group.py',
   'app/usage_model.py',

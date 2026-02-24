@@ -16,7 +16,6 @@ A native GNOME desktop application for monitoring Claude Code usage and rate lim
 - **Colour-coded bars** — green / yellow / red based on GNOME HIG palette
 - **Auto-refresh** — configurable interval (15–300 seconds, default 60)
 - **Desktop notifications** — alerts at 75%, 90%, and 95% session usage
-- **Claude Code statusline** — optional bash script for terminal integration
 - **Keyboard shortcuts** — Ctrl+R refresh, Ctrl+, preferences, Ctrl+? shortcuts
 - **Native GNOME** — GTK4 + Libadwaita 1.8, GSettings, `Gio.Notification`
 
@@ -88,7 +87,6 @@ src/
     usage_calculator.py    # Threshold/colour logic
     usage_group.py         # Usage group composite widget
     preferences.py         # Preferences dialog (GSettings)
-    statusline.py          # Claude Code statusline integration
   ui/
     window.ui              # Main window template
     usage-group.ui         # Usage group template
@@ -106,7 +104,6 @@ tests/
   conftest.py              # Shared test configuration
   test_api_client.py
   test_credential_reader.py
-  test_statusline.py
   test_usage_calculator.py
   test_usage_model.py
   test_window.py
@@ -123,7 +120,7 @@ tests/
 
 ## Acknowledgements
 
-Inspired by [Claude Usage Tracker](https://github.com/ASquaredLLC/claude-usage-tracker), a macOS SwiftUI menu bar app. The terminal statusline colour gradient is adapted from that project's bash script.
+Inspired by [Claude Usage Tracker](https://github.com/ASquaredLLC/claude-usage-tracker), a macOS SwiftUI menu bar app.
 
 ## Licence
 

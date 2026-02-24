@@ -22,13 +22,6 @@
 from gi.repository import Adw, Gio, Gtk
 
 from .config import APP_ID
-from .statusline import (
-    BrokenSymlinkError,
-    CorruptSettingsError,
-    DEFAULT_SCRIPT_PATH,
-    install_statusline,
-    uninstall_statusline,
-)
 
 
 @Gtk.Template(resource_path='/me/stephenlewis/Leeway/preferences-dialog.ui')
@@ -40,8 +33,6 @@ class LeewayPreferencesDialog(Adw.PreferencesDialog):
     notify_90_row = Gtk.Template.Child()
     notify_95_row = Gtk.Template.Child()
     test_notification_button = Gtk.Template.Child()
-    statusline_row = Gtk.Template.Child()
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -75,16 +66,6 @@ class LeewayPreferencesDialog(Adw.PreferencesDialog):
             'clicked', self._on_test_notification,
         )
 
-        # Statusline toggle: set initial state from filesystem
-        installed = DEFAULT_SCRIPT_PATH.exists()
-        self.statusline_row.set_active(installed)
-        if installed:
-            self.statusline_row.set_subtitle(str(DEFAULT_SCRIPT_PATH))
-
-        self._statusline_handler_id = self.statusline_row.connect(
-            'notify::active', self._on_statusline_toggled,
-        )
-
     def _on_test_notification(self, _button):
         app = Gio.Application.get_default()
         if not app:
@@ -95,18 +76,3 @@ class LeewayPreferencesDialog(Adw.PreferencesDialog):
         notification.set_body('Notifications are working.')
         app.send_notification('test-notification', notification)
         self.add_toast(Adw.Toast(title='Test notification sent'))
-
-    def _on_statusline_toggled(self, row, _param):
-        try:
-            if row.get_active():
-                install_statusline()
-                row.set_subtitle(str(DEFAULT_SCRIPT_PATH))
-            else:
-                uninstall_statusline()
-                row.set_subtitle('Installs a bash script to ~/.claude/')
-        except (OSError, BrokenSymlinkError, CorruptSettingsError) as exc:
-            # Block the signal to avoid re-entrant calls while reverting.
-            row.handler_block(self._statusline_handler_id)
-            row.set_active(not row.get_active())
-            row.handler_unblock(self._statusline_handler_id)
-            self.add_toast(Adw.Toast(title=f'Statusline error: {exc}'))

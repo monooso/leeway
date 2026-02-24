@@ -63,18 +63,6 @@
             </child>
           </object>
         </child>
-        <child>
-          <object class="AdwPreferencesGroup">
-            <property name="title" translatable="yes">Claude Code Statusline</property>
-            <property name="description" translatable="yes">Show usage in the Claude Code terminal status line.</property>
-            <child>
-              <object class="AdwSwitchRow" id="statusline_row">
-                <property name="title" translatable="yes">Enable statusline</property>
-                <property name="subtitle" translatable="yes">Installs a bash script to ~/.claude/</property>
-              </object>
-            </child>
-          </object>
-        </child>
       </object>
     </child>
   </template>
