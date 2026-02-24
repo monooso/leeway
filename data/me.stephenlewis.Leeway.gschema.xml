@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="leeway">
+	<schema id="me.stephenlewis.Leeway" path="/me/stephenlewis/Leeway/">
+		<key name="refresh-interval" type="u">
+			<default>60</default>
+			<summary>Refresh interval</summary>
+			<description>Seconds between API requests (15–300).</description>
+		</key>
+		<key name="notify-at-75" type="b">
+			<default>true</default>
+			<summary>Notify at 75%</summary>
+			<description>Send a desktop notification when session usage reaches 75%.</description>
+		</key>
+		<key name="notify-at-90" type="b">
+			<default>true</default>
+			<summary>Notify at 90%</summary>
+			<description>Send a desktop notification when session usage reaches 90%.</description>
+		</key>
+		<key name="notify-at-95" type="b">
+			<default>true</default>
+			<summary>Notify at 95%</summary>
+			<description>Send a desktop notification when session usage reaches 95%.</description>
+		</key>
+	</schema>
+</schemalist>
