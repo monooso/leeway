@@ -31,7 +31,8 @@
             "sources" : [
                 {
                     "type" : "git",
-                    "url" : "file:///home/sl/code/leeway"
+                    "url" : "file:///home/sl/code/leeway",
+                    "branch" : "main"
                 }
             ],
             "config-opts" : [
