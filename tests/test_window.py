@@ -1,12 +1,8 @@
-"""Tests for window module — pure functions only."""
-
-import pytest
-
-pytest.importorskip("gi", reason="gi (PyGObject) not available outside Flatpak sandbox")
+"""Tests for formatting module — pure functions only."""
 
 from datetime import datetime, timedelta, timezone
 
-from window import _format_reset_time, _truncate_error
+from formatting import _format_reset_time, _truncate_error
 
 # Fixed reference point for deterministic tests.
 NOW = datetime(2026, 2, 20, 12, 0, 0, tzinfo=timezone.utc)

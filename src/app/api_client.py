@@ -17,27 +17,19 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-"""Fetches usage data from the Anthropic API."""
+"""Pure protocol logic for the Anthropic usage API."""
 
 import json
 
-import gi
-
-gi.require_version("Soup", "3.0")
-
-from gi.repository import Gio, GLib, Soup
-
-from .config import APP_ID, VERSION
-from .usage_model import UsageData, parse_usage_response
+try:
+    from .config import APP_ID, VERSION
+    from .usage_model import UsageData, parse_usage_response
+except ImportError:
+    from config import APP_ID, VERSION
+    from usage_model import UsageData, parse_usage_response
 
 API_URL = "https://api.anthropic.com/api/oauth/usage"
 USER_AGENT = f"{APP_ID}/{VERSION}"
-
-# Module-level session — reused across requests, avoids GC disposal warnings.
-# Short idle timeout prevents stale keep-alive connections from causing
-# "Socket I/O timed out" errors when the refresh interval elapses.
-_session = Soup.Session()
-_session.set_idle_timeout(10)
 
 
 class ApiError(Exception):
@@ -68,53 +60,3 @@ def parse_response_body(body: str) -> UsageData:
         raise ApiError("Failed to parse API response: expected JSON object")
 
     return parse_usage_response(raw)
-
-
-def fetch_usage(access_token: str, callback, cancellable: Gio.Cancellable | None = None):
-    """Fetch usage data asynchronously using libsoup3.
-
-    Args:
-        access_token: OAuth Bearer token.
-        callback: Called with (UsageData | None, str | None).
-            On success: callback(data, None).
-            On failure: callback(None, error_message).
-        cancellable: Optional GCancellable to abort the request.
-    """
-    message = Soup.Message.new("GET", API_URL)
-
-    headers = build_request_headers(access_token)
-    request_headers = message.get_request_headers()
-    for name, value in headers.items():
-        request_headers.append(name, value)
-
-    def on_response(_session, result):
-        try:
-            gbytes = _session.send_and_read_finish(result)
-        except GLib.Error as exc:
-            # Silently ignore cancellation — the window is closing.
-            if exc.matches(Gio.io_error_quark(), Gio.IOErrorEnum.CANCELLED):
-                return
-            callback(None, f"HTTP request failed: {exc.message}")
-            return
-
-        status = message.get_status()
-        if status != Soup.Status.OK:
-            phrase = Soup.Status.get_phrase(status)
-            callback(None, f"API returned {int(status)}: {phrase}")
-            return
-
-        try:
-            body = gbytes.get_data().decode("utf-8")
-        except Exception as exc:
-            callback(None, f"Failed to read response: {exc}")
-            return
-
-        try:
-            data = parse_response_body(body)
-        except ApiError as exc:
-            callback(None, str(exc))
-            return
-
-        callback(data, None)
-
-    _session.send_and_read_async(message, GLib.PRIORITY_DEFAULT, cancellable, on_response)

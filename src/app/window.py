@@ -24,43 +24,12 @@ from datetime import datetime, timezone
 from gi.repository import Adw, Gio, GLib, Gtk
 
 from .usage_group import LeewayUsageGroup  # noqa: F401 — registers the GType
-from .api_client import fetch_usage
+from .api_fetcher import fetch_usage
 from .config import APP_ID
 from .credential_reader import CredentialError, read_credentials
+from .formatting import _format_reset_time, _truncate_error
 from .usage_calculator import color_for_pct
 from .usage_model import UsageData
-
-
-def _format_reset_time(dt: datetime | None, *, now: datetime | None = None) -> str:
-    """Format a reset datetime as a human-readable countdown or timestamp."""
-    if dt is None:
-        return "\u2014"
-    if now is None:
-        now = datetime.now(timezone.utc)
-    delta = dt - now
-    total_seconds = int(delta.total_seconds())
-
-    if total_seconds <= 0:
-        return "now"
-
-    hours, remainder = divmod(total_seconds, 3600)
-    minutes = remainder // 60
-
-    if hours >= 24:
-        days = hours // 24
-        return f"{days}d {hours % 24}h {minutes}m"
-    if hours > 0:
-        return f"{hours}h {minutes}m"
-    if minutes > 0:
-        return f"{minutes}m"
-    return "< 1m"
-
-
-def _truncate_error(message: str, *, max_length: int = 120) -> str:
-    """Truncate an error message to a sensible display length."""
-    if len(message) <= max_length:
-        return message
-    return message[: max_length - 3] + "..."
 
 
 def _apply_color_to_bar(

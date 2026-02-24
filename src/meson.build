@@ -30,8 +30,10 @@ configure_file(
 leeway_sources = [
   'app/__init__.py',
   'app/api_client.py',
+  'app/api_fetcher.py',
   'app/config.py',
   'app/credential_reader.py',
+  'app/formatting.py',
   'app/main.py',
   'app/preferences.py',
   'app/usage_calculator.py',
