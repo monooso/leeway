@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=leeway
+Exec=leeway
+Icon=me.stephenlewis.Leeway
+Terminal=false
+Type=Application
+Categories=Utility;
+Keywords=GTK;
+StartupNotify=true
+DBusActivatable=true

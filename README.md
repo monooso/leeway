@@ -1,6 +1,6 @@
-# Headroom
+# Leeway
 
-![Headroom application screenshot](docs/claude-usage-screenshot.png)
+![Leeway application screenshot](docs/main-window-dark.png)
 
 A native GNOME desktop application for monitoring Claude Code usage and rate limits. Displays session, weekly, and Opus utilisation with colour-coded progress bars, countdown timers, and desktop notifications.
 

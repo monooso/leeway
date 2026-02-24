@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="Adw" version="1.8"/>
+  <template class="LeewayUsageGroup" parent="AdwPreferencesGroup">
+    <property name="header-suffix">
+      <object class="GtkLabel" id="reset_label">
+        <property name="label"></property>
+        <property name="valign">center</property>
+        <style>
+          <class name="dim-label"/>
+        </style>
+      </object>
+    </property>
+    <child>
+      <object class="AdwActionRow" id="row">
+        <property name="title" translatable="yes">Usage</property>
+        <property name="subtitle">—</property>
+        <child type="suffix">
+          <object class="GtkLevelBar" id="bar">
+            <property name="min-value">0</property>
+            <property name="max-value">100</property>
+            <property name="value">0</property>
+            <property name="valign">center</property>
+            <property name="hexpand">True</property>
+            <property name="width-request">120</property>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

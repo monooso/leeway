@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>me.stephenlewis.Leeway</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>AGPL-3.0-or-later</project_license>
+
+  <name>Leeway</name>
+  <summary>Track Claude Code usage limits in real time</summary>
+  <description>
+    <p>A native GNOME desktop application for monitoring Claude Code usage and rate limits. Displays session, weekly, and Opus utilisation with colour-coded progress bars, countdown timers, and desktop notifications.</p>
+    <p><em>Requires a Claude Pro or Max subscription with Claude Code</em>. This app tracks subscription rate limits, not API key billing. It authenticates via the Claude Code CLI OAuth credentials stored at ~/.claude/.credentials.json.</p>
+  </description>
+
+  <developer id="me.stephenlewis">
+    <name>Stephen Lewis</name>
+  </developer>
+
+  <url type="homepage">https://github.com/monooso/leeway</url>
+  <url type="vcs-browser">https://github.com/monooso/leeway</url>
+  <url type="bugtracker">https://github.com/monooso/leeway/issues</url>
+  <url type="help">https://github.com/monooso/leeway/blob/main/README.md</url>
+  <url type="contribute">https://github.com/monooso/leeway/blob/main/README.md#contributing</url>
+
+  <translation type="gettext">leeway</translation>
+  <launchable type="desktop-id">me.stephenlewis.Leeway.desktop</launchable>
+  <content_rating type="oars-1.1" />
+
+  <branding>
+    <color type="primary" scheme_preference="light">#E66100</color>
+    <color type="primary" scheme_preference="dark">#FF7800</color>
+  </branding>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/monooso/leeway/main/docs/main-window-dark.png</image>
+      <caption>The main Leeway window (dark mode)</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/monooso/leeway/main/docs/main-window-light.png</image>
+      <caption>The main Leeway window (light mode)</caption>
+    </screenshot>
+  </screenshots>
+
+  <releases>
+    <release version="1.0.0" date="2026-02-24">
+      <url type="details">https://github.com/monooso/leeway</url>
+      <description translate="no">
+        <p>Initial release</p>
+        <ul>
+          <li>List of changes</li>
+          <li>List of changes</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+</component>

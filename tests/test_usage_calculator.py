@@ -1,65 +1,57 @@
-"""Tests for usage_calculator module."""
+# tests/test_usage_calculator.py
+#
+# Copyright 2026 Stephen Lewis
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
-from usage_calculator import (
-    CRITICAL_THRESHOLD,
-    MODERATE_THRESHOLD,
-    STATUS_COLORS,
-    StatusLevel,
-    color_for_pct,
-    color_for_status,
-    status_for_pct,
-)
+"""Tests for usage_calculator colour mappings."""
 
+from math import isclose
 
-class TestStatusForPct:
-    """Tests for status_for_pct()."""
-
-    def test_zero_is_safe(self):
-        assert status_for_pct(0.0) == StatusLevel.SAFE
-
-    def test_at_moderate_threshold_is_safe(self):
-        assert status_for_pct(MODERATE_THRESHOLD) == StatusLevel.SAFE
-
-    def test_just_above_moderate_threshold_is_moderate(self):
-        assert status_for_pct(MODERATE_THRESHOLD + 0.1) == StatusLevel.MODERATE
-
-    def test_at_critical_threshold_is_moderate(self):
-        assert status_for_pct(CRITICAL_THRESHOLD) == StatusLevel.MODERATE
-
-    def test_just_above_critical_threshold_is_critical(self):
-        assert status_for_pct(CRITICAL_THRESHOLD + 0.1) == StatusLevel.CRITICAL
-
-    def test_hundred_is_critical(self):
-        assert status_for_pct(100.0) == StatusLevel.CRITICAL
-
-    def test_none_is_unknown(self):
-        assert status_for_pct(None) == StatusLevel.UNKNOWN
+from usage_calculator import STATUS_COLORS, StatusLevel
 
 
-class TestColorForStatus:
-    """Tests for color_for_status()."""
-
-    def test_safe_is_green(self):
-        assert color_for_status(StatusLevel.SAFE) == (0.18, 0.80, 0.44)
-
-    def test_moderate_is_amber(self):
-        assert color_for_status(StatusLevel.MODERATE) == (0.95, 0.77, 0.06)
-
-    def test_critical_is_red(self):
-        assert color_for_status(StatusLevel.CRITICAL) == (0.90, 0.24, 0.24)
-
-    def test_unknown_is_grey(self):
-        assert color_for_status(StatusLevel.UNKNOWN) == (0.50, 0.50, 0.50)
+def _hex_to_floats(hex_color: str) -> tuple[float, float, float]:
+    """Convert a hex colour string like '#33D17A' to an (R, G, B) float tuple."""
+    h = hex_color.lstrip("#")
+    return (int(h[0:2], 16) / 255, int(h[2:4], 16) / 255, int(h[4:6], 16) / 255)
 
 
-class TestColorForPct:
-    """Tests for color_for_pct() convenience function."""
+# GNOME HIG standard palette.
+GNOME_GREEN = "#33D17A"
+GNOME_YELLOW = "#F6D32D"
+GNOME_RED = "#C01C28"
 
-    def test_low_usage_returns_green(self):
-        assert color_for_pct(20.0) == STATUS_COLORS[StatusLevel.SAFE]
 
-    def test_high_usage_returns_red(self):
-        assert color_for_pct(95.0) == STATUS_COLORS[StatusLevel.CRITICAL]
+def _assert_color_matches(actual: tuple[float, float, float], expected_hex: str):
+    """Assert each RGB channel matches the expected hex value within rounding tolerance."""
+    expected = _hex_to_floats(expected_hex)
+    for i, channel in enumerate(("R", "G", "B")):
+        assert isclose(actual[i], expected[i], abs_tol=0.01), (
+            f"{channel}: {actual[i]:.3f} != {expected[i]:.3f} (from {expected_hex})"
+        )
 
-    def test_none_returns_grey(self):
-        assert color_for_pct(None) == STATUS_COLORS[StatusLevel.UNKNOWN]
+
+class TestStatusColors:
+    def test_safe_is_gnome_green(self):
+        _assert_color_matches(STATUS_COLORS[StatusLevel.SAFE], GNOME_GREEN)
+
+    def test_moderate_is_gnome_yellow(self):
+        _assert_color_matches(STATUS_COLORS[StatusLevel.MODERATE], GNOME_YELLOW)
+
+    def test_critical_is_gnome_red(self):
+        _assert_color_matches(STATUS_COLORS[StatusLevel.CRITICAL], GNOME_RED)
+

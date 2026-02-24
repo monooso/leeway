@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=Headroom
-Comment=Track Claude Code usage and rate limits
-Exec=@BINDIR@/headroom
-Icon=@APP_ID@
-Terminal=false
-Type=Application
-Categories=Utility;
-StartupNotify=true

@@ -1,4 +1,0 @@
-#!/bin/bash
-# Launcher for Headroom
-export PYTHONPATH="@PKGDATADIR@"
-exec @PYTHON@ @PKGDATADIR@/main.py "$@"
