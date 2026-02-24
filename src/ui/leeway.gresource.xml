@@ -3,7 +3,7 @@
   <gresource prefix="/me/stephenlewis/Leeway">
     <file preprocess="xml-stripblanks">window.ui</file>
     <file preprocess="xml-stripblanks">usage-group.ui</file>
-    <file preprocess="xml-stripblanks">shortcuts-dialog.ui</file>
-    <file preprocess="xml-stripblanks">preferences-dialog.ui</file>
+    <file preprocess="xml-stripblanks" alias="shortcuts-dialog.ui">shortcuts.ui</file>
+    <file preprocess="xml-stripblanks" alias="preferences-dialog.ui">preferences.ui</file>
   </gresource>
 </gresources>
