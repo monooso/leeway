@@ -44,11 +44,12 @@ def status_for_pct(pct: float | None) -> StatusLevel:
 
 
 # RGB tuples (0.0-1.0) for GTK colour properties.
+# GNOME HIG standard palette: green #33D17A, yellow #F6D32D, red #C01C28.
 STATUS_COLORS: dict[StatusLevel, tuple[float, float, float]] = {
-    StatusLevel.SAFE: (0.18, 0.80, 0.44),       # green
-    StatusLevel.MODERATE: (0.95, 0.77, 0.06),    # amber
-    StatusLevel.CRITICAL: (0.90, 0.24, 0.24),    # red
-    StatusLevel.UNKNOWN: (0.50, 0.50, 0.50),     # grey
+    StatusLevel.SAFE: (0x33 / 255, 0xD1 / 255, 0x7A / 255),       # green
+    StatusLevel.MODERATE: (0xF6 / 255, 0xD3 / 255, 0x2D / 255),   # yellow
+    StatusLevel.CRITICAL: (0xC0 / 255, 0x1C / 255, 0x28 / 255),   # red
+    StatusLevel.UNKNOWN: (0.50, 0.50, 0.50),                       # grey
 }
 
 
