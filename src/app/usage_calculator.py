@@ -29,13 +29,10 @@ class StatusLevel(Enum):
     SAFE = auto()      # <= MODERATE_THRESHOLD
     MODERATE = auto()  # MODERATE_THRESHOLD < x <= CRITICAL_THRESHOLD
     CRITICAL = auto()  # > CRITICAL_THRESHOLD
-    UNKNOWN = auto()   # No data
 
 
-def status_for_pct(pct: float | None) -> StatusLevel:
+def status_for_pct(pct: float) -> StatusLevel:
     """Map a utilisation percentage to a status level."""
-    if pct is None:
-        return StatusLevel.UNKNOWN
     if pct <= MODERATE_THRESHOLD:
         return StatusLevel.SAFE
     if pct <= CRITICAL_THRESHOLD:
@@ -49,7 +46,6 @@ STATUS_COLORS: dict[StatusLevel, tuple[float, float, float]] = {
     StatusLevel.SAFE: (0x33 / 255, 0xD1 / 255, 0x7A / 255),       # green
     StatusLevel.MODERATE: (0xF6 / 255, 0xD3 / 255, 0x2D / 255),   # yellow
     StatusLevel.CRITICAL: (0xC0 / 255, 0x1C / 255, 0x28 / 255),   # red
-    StatusLevel.UNKNOWN: (0x77 / 255, 0x76 / 255, 0x7B / 255),     # grey
 }
 
 
@@ -58,6 +54,6 @@ def color_for_status(level: StatusLevel) -> tuple[float, float, float]:
     return STATUS_COLORS[level]
 
 
-def color_for_pct(pct: float | None) -> tuple[float, float, float]:
+def color_for_pct(pct: float) -> tuple[float, float, float]:
     """Convenience: map a percentage directly to a colour."""
     return color_for_status(status_for_pct(pct))

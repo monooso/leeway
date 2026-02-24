@@ -39,7 +39,6 @@ def _hex_to_floats(hex_color: str) -> tuple[float, float, float]:
 GNOME_GREEN = "#33D17A"
 GNOME_YELLOW = "#F6D32D"
 GNOME_RED = "#C01C28"
-GNOME_GREY = "#77767B"
 
 
 def _assert_color_matches(actual: tuple[float, float, float], expected_hex: str):
@@ -61,5 +60,3 @@ class TestStatusColors:
     def test_critical_is_gnome_red(self):
         _assert_color_matches(STATUS_COLORS[StatusLevel.CRITICAL], GNOME_RED)
 
-    def test_unknown_is_gnome_grey(self):
-        _assert_color_matches(STATUS_COLORS[StatusLevel.UNKNOWN], GNOME_GREY)

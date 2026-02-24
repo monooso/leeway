@@ -65,7 +65,7 @@ def _truncate_error(message: str, *, max_length: int = 120) -> str:
 
 def _apply_color_to_bar(
     bar: Gtk.LevelBar,
-    pct: float | None,
+    pct: float,
     bar_css: dict[Gtk.LevelBar, tuple[str, Gtk.CssProvider]],
 ):
     """Apply a CSS colour to a LevelBar based on usage percentage."""
