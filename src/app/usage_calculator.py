@@ -49,7 +49,7 @@ STATUS_COLORS: dict[StatusLevel, tuple[float, float, float]] = {
     StatusLevel.SAFE: (0x33 / 255, 0xD1 / 255, 0x7A / 255),       # green
     StatusLevel.MODERATE: (0xF6 / 255, 0xD3 / 255, 0x2D / 255),   # yellow
     StatusLevel.CRITICAL: (0xC0 / 255, 0x1C / 255, 0x28 / 255),   # red
-    StatusLevel.UNKNOWN: (0.50, 0.50, 0.50),                       # grey
+    StatusLevel.UNKNOWN: (0x77 / 255, 0x76 / 255, 0x7B / 255),     # grey
 }
 
 
