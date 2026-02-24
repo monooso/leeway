@@ -1,43 +1,43 @@
-python_path = get_option('python_path')
-pkgdatadir = get_option('prefix') / get_option('datadir') / 'headroom'
+pkgdatadir = get_option('prefix') / get_option('datadir') / meson.project_name()
+moduledir = pkgdatadir / 'leeway'
+gnome = import('gnome')
 
-sources = files(
-  'main.py',
-  'application.py',
-  'window.py',
-  'credential_reader.py',
-  'api_client.py',
-  'usage_model.py',
-  'usage_calculator.py',
-  'preferences.py',
-  'statusline.py',
-)
-
-install_data(sources, install_dir: pkgdatadir)
-
-# Generate config.py with build-time values
-config_data = configuration_data()
-config_data.set('VERSION', meson.project_version())
-config_data.set('APP_ID', app_id)
-
-configure_file(
-  input: 'config.py.in',
-  output: 'config.py',
-  configuration: config_data,
+gnome.compile_resources('leeway',
+  'leeway.gresource.xml',
+  gresource_bundle: true,
   install: true,
   install_dir: pkgdatadir,
 )
 
-# Configure the launcher script with the correct python path and installed source dir
-launcher_conf = configuration_data()
-launcher_conf.set('PYTHON', python_path)
-launcher_conf.set('PKGDATADIR', pkgdatadir)
+python = import('python')
+
+conf = configuration_data()
+conf.set('PYTHON', python.find_installation('python3').full_path())
+conf.set('VERSION', meson.project_version())
+conf.set('localedir', get_option('prefix') / get_option('localedir'))
+conf.set('pkgdatadir', pkgdatadir)
 
 configure_file(
-  input: 'headroom.in',
-  output: 'headroom',
-  configuration: launcher_conf,
+  input: 'leeway.in',
+  output: 'leeway',
+  configuration: conf,
   install: true,
   install_dir: get_option('bindir'),
-  install_mode: 'rwxr-xr-x',
+  install_mode: 'rwxr-xr-x'
 )
+
+leeway_sources = [
+  '__init__.py',
+  'api_client.py',
+  'config.py',
+  'credential_reader.py',
+  'main.py',
+  'preferences.py',
+  'statusline.py',
+  'usage_calculator.py',
+  'usage_group.py',
+  'usage_model.py',
+  'window.py',
+]
+
+install_data(leeway_sources, install_dir: moduledir)
