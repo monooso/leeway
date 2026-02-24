@@ -3,7 +3,7 @@ moduledir = pkgdatadir / 'leeway'
 gnome = import('gnome')
 
 gnome.compile_resources('leeway',
-  'leeway.gresource.xml',
+  'ui/leeway.gresource.xml',
   gresource_bundle: true,
   install: true,
   install_dir: pkgdatadir,
